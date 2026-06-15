@@ -1,0 +1,34 @@
+{
+  "name": "Alert",
+  "type": "object",
+  "properties": {
+    "uid": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "market",
+        "scan",
+        "weather"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "read": {
+      "type": "boolean"
+    },
+    "linked_screen": {
+      "type": "string"
+    },
+    "meta": {
+      "type": "object"
+    }
+  },
+  "required": []
+}

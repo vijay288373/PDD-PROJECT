@@ -1,0 +1,37 @@
+{
+  "name": "PriceAlert",
+  "type": "object",
+  "properties": {
+    "uid": {
+      "type": "string"
+    },
+    "crop": {
+      "type": "string"
+    },
+    "target_price": {
+      "type": "number"
+    },
+    "unit": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "market": {
+      "type": "string"
+    },
+    "triggered": {
+      "type": "boolean"
+    },
+    "triggered_at": {
+      "type": "string"
+    },
+    "current_price_at_trigger": {
+      "type": "number"
+    },
+    "is_active": {
+      "type": "boolean"
+    }
+  },
+  "required": []
+}

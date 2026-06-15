@@ -1,0 +1,74 @@
+{
+  "name": "ScanHistory",
+  "type": "object",
+  "properties": {
+    "uid": {
+      "type": "string"
+    },
+    "crop": {
+      "type": "string"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "disease_name": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "number"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "none",
+        "mild",
+        "moderate",
+        "severe"
+      ]
+    },
+    "cause": {
+      "type": "string",
+      "enum": [
+        "fungal",
+        "bacterial",
+        "pest",
+        "nutritional",
+        "healthy"
+      ]
+    },
+    "treatment_steps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "prevention_tips": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "consult_agronomist": {
+      "type": "boolean"
+    },
+    "seasonal_care": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "is_healthy": {
+      "type": "boolean"
+    },
+    "region": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "synced": {
+      "type": "boolean"
+    }
+  },
+  "required": []
+}

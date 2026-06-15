@@ -1,0 +1,52 @@
+{
+  "name": "FarmerProfile",
+  "type": "object",
+  "properties": {
+    "uid": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "crop_zone": {
+      "type": "string"
+    },
+    "farm_size": {
+      "type": "number"
+    },
+    "farm_size_unit": {
+      "type": "string",
+      "enum": [
+        "acres",
+        "hectares"
+      ]
+    },
+    "primary_crops": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "farming_type": {
+      "type": "string",
+      "enum": [
+        "smallholder",
+        "commercial",
+        "organic"
+      ]
+    }
+  },
+  "required": []
+}

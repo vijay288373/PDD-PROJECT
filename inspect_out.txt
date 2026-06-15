@@ -1,0 +1,36 @@
+
+=========================================
+Inspecting: automated_test/DAST_Report_2026-06-10T07-12-39.xlsx
+=========================================
+Sheet names: ['Executive Dashboard', 'All Test Results', 'Failures & Findings', 'Category Summary', 'Remediation Guide']
+
+Sheet: Executive Dashboard (Max row: 26, Max col: 6)
+Row 1: [None, None, None, None, None, None]
+Row 2: [None, 'AGRIGUARD AI — DAST SECURITY REPORT', None, None, None, None]
+Row 3: [None, 'Generated: 2026-06-14 07:20:42 UTC', None, None, None, None]
+Row 4: [None, 'Target: http://localhost:5173', None, None, None, None]
+Row 5: [None, 'External APIs: Open-Meteo, Gemini LLM', None, None, None, None]
+
+Sheet: All Test Results (Max row: 132, Max col: 12)
+Row 1: ['#', 'Category', 'Test ID', 'Test Name', 'URL', 'Method', 'Status Code', 'Severity', 'Result', 'Detail', 'Response Snippet', 'Timestamp']
+Row 2: [1, 'Frontend Routes', 'T01-PlantScan', 'Route / accessible', 'http://localhost:5173/', 'GET', 200, 'INFO', 'PASS', 'HTTP 200', None, '2026-06-14T07:19:39.012256Z']
+Row 3: [2, 'Frontend Routes', 'T01-WeatherScreen', 'Route /weather accessible', 'http://localhost:5173/weather', 'GET', 200, 'INFO', 'PASS', 'HTTP 200', None, '2026-06-14T07:19:39.038053Z']
+Row 4: [3, 'Frontend Routes', 'T01-MarketPrices', 'Route /market accessible', 'http://localhost:5173/market', 'GET', 200, 'INFO', 'PASS', 'HTTP 200', None, '2026-06-14T07:19:39.044981Z']
+Row 5: [4, 'Frontend Routes', 'T01-AlertsCenter', 'Route /alerts accessible', 'http://localhost:5173/alerts', 'GET', 200, 'INFO', 'PASS', 'HTTP 200', None, '2026-06-14T07:19:39.140689Z']
+
+Sheet: Failures & Findings (Max row: 1, Max col: 12)
+Row 1: ['#', 'Category', 'Test ID', 'Test Name', 'URL', 'Method', 'Status Code', 'Severity', 'Result', 'Detail', 'Response Snippet', 'Timestamp']
+
+Sheet: Category Summary (Max row: 11, Max col: 6)
+Row 1: ['Category', 'Total Tests', 'Passed', 'Failed', 'Pass Rate %', 'Risk Status']
+Row 2: ['CORS', 4, 4, 0, '100%', '✅ Clean']
+Row 3: ['Clickjacking', 2, 2, 0, '100%', '✅ Clean']
+Row 4: ['Frontend Routes', 16, 16, 0, '100%', '✅ Clean']
+Row 5: ['Gemini API', 16, 16, 0, '100%', '✅ Clean']
+
+Sheet: Remediation Guide (Max row: 11, Max col: 6)
+Row 1: ['Severity', 'Finding', 'Remediation', 'Priority', 'Effort', 'References']
+Row 2: ['CRITICAL', 'API key in .env exposed via HTTP', 'Ensure Vite dev server does NOT serve .env. Add /.env to deny list or move to server-side proxy.', 'P0', 'Low', 'OWASP A02:2021']
+Row 3: ['HIGH', 'Missing X-Frame-Options / CSP frame-ancestors', "Add X-Frame-Options: DENY or CSP frame-ancestors 'none' in Vite server config.", 'P1', 'Low', 'OWASP A05:2021']
+Row 4: ['HIGH', 'Missing Content-Security-Policy header', 'Define strict CSP via Vite plugin or middleware. Restrict default-src, script-src.', 'P1', 'Medium', 'OWASP A05:2021']
+Row 5: ['HIGH', 'Prompt injection in Gemini LLM calls', 'Sanitise all user-controlled input before passing to LLM. Add output validation.', 'P1', 'Medium', 'OWASP LLM01:2025']

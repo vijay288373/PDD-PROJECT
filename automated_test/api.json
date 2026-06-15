@@ -1,0 +1,31 @@
+{
+  "BASE_URL": "http://localhost:5173",
+  "GEMINI_BASE": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+  "OPEN_METEO_BASE": "https://api.open-meteo.com/v1/forecast",
+  "SUPABASE_URL": "",
+  "SUPABASE_ANON_KEY": "",
+  "GEMINI_API_KEY": "AIzaSyBKsUFGSuiT1iFQ-ap64hIpCeJlX-2B3Sw",
+  "APP_ROUTES": [
+    { "path": "/", "name": "PlantScan" },
+    { "path": "/weather", "name": "WeatherScreen" },
+    { "path": "/market", "name": "MarketPrices" },
+    { "path": "/alerts", "name": "AlertsCenter" },
+    { "path": "/profile", "name": "ProfileSettings" }
+  ],
+  "EXTERNAL_APIS": [
+    {
+      "name": "Open-Meteo Weather",
+      "base": "https://api.open-meteo.com/v1/forecast",
+      "method": "GET",
+      "auth": "none"
+    },
+    {
+      "name": "Google Gemini LLM",
+      "base": "https://generativelanguage.googleapis.com/v1beta/models",
+      "method": "POST",
+      "auth": "api_key"
+    }
+  ],
+  "SUPABASE_ENTITIES": ["FarmerProfile", "ScanHistory", "Alert", "PriceAlert"],
+  "notes": "Supabase is DISABLED (empty keys). App runs on localStorage. Only live external APIs are Open-Meteo and Gemini."
+}
