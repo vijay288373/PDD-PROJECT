@@ -86,7 +86,8 @@ class AgriGuardE2ETests(unittest.TestCase):
         # Init Selenium WebDriver
         log_event("INFO", "Starting Headless Chrome Browser...")
         options = Options()
-        options.binary_location = CHROME_PATH
+        if os.path.exists(CHROME_PATH):
+            options.binary_location = CHROME_PATH
         options.add_argument("--headless=new")
         options.add_argument("--disable-gpu")
         options.add_argument("--window-size=1280,800")
