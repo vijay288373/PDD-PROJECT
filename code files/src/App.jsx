@@ -8,13 +8,15 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { LangProvider } from '@/lib/useLang.jsx';
 import OfflineBanner from '@/components/OfflineBanner';
 import AddToHomePrompt from '@/components/AddToHomePrompt';
-// Add page imports here
+// Page imports
 import PlantScan from "./pages/PlantScan";
 import WeatherScreen from "./pages/WeatherScreen";
 import MarketPrices from "./pages/MarketPrices";
 import AlertsCenter from "./pages/AlertsCenter";
 import ProfileSettings from "./pages/ProfileSettings";
 import LoginPage from "./pages/LoginPage";
+import CropAdvisor from "./pages/CropAdvisor";
+import CropGrowthAdvisor from "./pages/CropGrowthAdvisor";
 
 const AuthenticatedApp = () => {
   const { isAuthenticated, isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -37,11 +39,13 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route path="/" element={<PlantScan />} />
+      <Route path="/crop-advisor" element={<CropAdvisor />} />
+      <Route path="/growth-advisor" element={<CropGrowthAdvisor />} />
       <Route path="/weather" element={<WeatherScreen />} />
       <Route path="/market" element={<MarketPrices />} />
       <Route path="/alerts" element={<AlertsCenter />} />
       <Route path="/profile" element={<ProfileSettings />} />
-      {/* Add your page Route elements here */}
+      {/* Catch-all */}
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

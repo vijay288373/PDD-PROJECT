@@ -49,7 +49,7 @@ export default function ProfileSettings() {
     <div className="min-h-screen bg-[#f5f8f0]">
       {/* Header */}
       <div className="bg-[#1a5c2a] px-4 pt-safe-top pb-4 shadow-lg">
-        <div className="max-w-lg mx-auto flex items-center gap-2">
+        <div className="w-full flex items-center gap-2">
           <div className="w-8 h-8 bg-[#4ade80] rounded-full flex items-center justify-center">
             <Leaf className="w-4 h-4 text-[#1a5c2a]" />
           </div>
@@ -57,7 +57,7 @@ export default function ProfileSettings() {
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto pb-24 px-4">
+      <div className="w-full pb-24 px-4">
         <ProfileHeader
           user={user}
           profile={profile}

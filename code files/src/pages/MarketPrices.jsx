@@ -97,13 +97,63 @@ export default function MarketPrices() {
     init();
   }, []);
 
+  // Try APMC data.gov.in live prices
+  const fetchAPMCPrices = useCallback(async (region, cropList) => {
+    try {
+      const stateName = region?.split(',').find(s => s.trim().length > 3)?.trim() || 'Tamil Nadu';
+      const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=579b464db66ec23bdd000001cdd3946e44ce4aad38534209a06fe33&format=json&limit=50&filters[State]=${encodeURIComponent(stateName)}`;
+      const resp = await fetch(url);
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data?.records?.length > 0) {
+          const newPrices = {};
+          data.records.forEach(rec => {
+            const commodity = rec.Commodity || rec.commodity || '';
+            const modal = parseFloat(rec.Modal_Price || rec.modal_price || 0);
+            const min = parseFloat(rec.Min_Price || rec.min_price || 0);
+            const max = parseFloat(rec.Max_Price || rec.max_price || 0);
+            if (commodity && modal > 0) {
+              const matched = cropList.find(c =>
+                c.toLowerCase().includes(commodity.toLowerCase().slice(0, 4)) ||
+                commodity.toLowerCase().includes(c.toLowerCase().slice(0, 4))
+              );
+              if (matched && !newPrices[matched]) {
+                const base = newPrices[matched]?.modal_price || modal;
+                newPrices[matched] = {
+                  modal_price: modal, min_price: min, max_price: max,
+                  change_pct: parseFloat(((modal - base) / base * 100).toFixed(1)),
+                  unit: 'quintal', estimated: false,
+                  mandi: rec.Market || rec.market || stateName
+                };
+              }
+            }
+          });
+          if (Object.keys(newPrices).length > 0) {
+            setPriceData(prev => ({ ...prev, ...newPrices }));
+            setLastUpdated(new Date());
+            return true;
+          }
+        }
+      }
+    } catch (e) {
+      console.log('APMC API unavailable, using AI prices:', e.message);
+    }
+    return false;
+  }, []);
+
   const fetchPrices = useCallback(async (cropList, region) => {
     if (!cropList.length) return;
     setLoading(true);
     setPriceError(false);
+
+    // Try live APMC data first
+    const apmc_ok = await fetchAPMCPrices(region, cropList);
+    if (apmc_ok) { setLoading(false); return; }
+
+    // Fallback: AI-generated mandi prices
     try {
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an agricultural market data service for India.
+        prompt: `You are an agricultural market data service for India. Provide highly realistic, up-to-date simulated market prices (modal, min, max in INR per quintal) reflecting current trends.
 Region: ${region || "India"}
 Crops: ${cropList.join(", ")}
 Today's date: ${new Date().toDateString()}
@@ -144,7 +194,7 @@ Be realistic. Rice ~1800-2200, Wheat ~2000-2500, Tomato ~800-3000 (volatile), On
       }
     } catch { setPriceError(true); }
     setLoading(false);
-  }, []);
+  }, [fetchAPMCPrices]);
 
   useEffect(() => {
     if (crops.length) {
@@ -262,7 +312,7 @@ Provide market intelligence in this EXACT JSON format:
     <div className="min-h-screen bg-[#f5f8f0]">
       {/* Header */}
       <div className="bg-[#1a5c2a] px-4 pt-4 pb-4 shadow-lg">
-        <div className="max-w-lg mx-auto">
+        <div className="w-full">
           <div className="flex items-center justify-between mb-3">
             <div>
               <div className="flex items-center gap-2">
@@ -312,7 +362,7 @@ Provide market intelligence in this EXACT JSON format:
 
       {/* Tab bar */}
       <div className="bg-[#1a5c2a] px-4 sticky top-0 z-10">
-        <div className="flex gap-1 pb-3 max-w-lg mx-auto">
+        <div className="flex gap-1 pb-3 w-full">
           {["prices", "forecast"].map(tab => (
             <button
               key={tab}
@@ -338,7 +388,7 @@ Provide market intelligence in this EXACT JSON format:
       )}
 
       {/* Content */}
-      <div ref={containerRef} className="max-w-lg mx-auto pb-20 min-h-[60vh]">
+      <div ref={containerRef} className="w-full pb-20 min-h-[60vh]">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

@@ -15,7 +15,8 @@ export const getPrecisionLocation = () => {
 };
 
 export const getGeocodedLocation = async (lat, lon, force = false) => {
-  const cacheKey = `geo_${lat.toFixed(3)}_${lon.toFixed(3)}`;
+  const cacheVersion = 'v2'; // Bump to invalidate stale geocode cache
+  const cacheKey = `geo_${cacheVersion}_${lat.toFixed(3)}_${lon.toFixed(3)}`;
   const cached = localStorage.getItem(cacheKey);
   if (cached && !force) {
     try {

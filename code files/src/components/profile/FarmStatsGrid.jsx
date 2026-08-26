@@ -27,12 +27,14 @@ export default function FarmStatsGrid({ profile, user }) {
           key={stat.label}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: i * 0.06 }}
-          className="bg-white rounded-2xl p-4 shadow-sm border border-[#e8f5e9]"
+          transition={{ delay: i * 0.05, duration: 0.3 }}
+          className="glass-card-interactive p-4 border-emerald-500/20 shadow-lg"
         >
-          <p className="text-2xl mb-1">{stat.emoji}</p>
-          <p className="text-xs text-gray-400">{stat.label}</p>
-          <p className="font-bold text-gray-800 capitalize mt-0.5 truncate">{String(stat.value)}</p>
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-xl mb-2 backdrop-blur-md">
+            {stat.emoji}
+          </div>
+          <p className="text-[11px] font-medium text-slate-400 dark:text-slate-400">{stat.label}</p>
+          <p className="font-extrabold text-slate-800 dark:text-slate-100 capitalize mt-0.5 truncate tracking-tight">{String(stat.value)}</p>
         </motion.div>
       ))}
     </div>

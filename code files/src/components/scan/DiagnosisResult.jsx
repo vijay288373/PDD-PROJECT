@@ -100,6 +100,25 @@ export default function DiagnosisResult({ result, isAnalyzing, capturedImage, se
     );
   }
 
+  if (result.is_invalid_image) {
+    return (
+      <div className="p-6 flex flex-col items-center text-center py-16 bg-amber-500/10 border border-amber-500/30 rounded-3xl backdrop-blur-xl my-6">
+        <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center mb-4 text-amber-500">
+          <AlertTriangle className="w-8 h-8" />
+        </div>
+        <h3 className="text-xl font-bold text-amber-300 mb-2">
+          Invalid Image Detected
+        </h3>
+        <p className="text-slate-300 text-sm max-w-md mb-6 leading-relaxed">
+          {result.invalid_reason || "Please scan a clear plant leaf image. Non-plant or irrelevant photos cannot be diagnosed."}
+        </p>
+        <Button id="btn-scan-again" onClick={onScanAgain} className="bg-emerald-600 hover:bg-emerald-500 text-white rounded-full min-h-[48px] px-6 font-semibold">
+          <RefreshCw className="w-4 h-4 mr-2" /> Scan Proper Leaf Image
+        </Button>
+      </div>
+    );
+  }
+
   if (result.error) {
     return (
       <div className="p-6 flex flex-col items-center text-center py-20">

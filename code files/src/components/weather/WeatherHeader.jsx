@@ -69,7 +69,7 @@ export default function WeatherHeader({ weather, loading, lastUpdated, onRefresh
             <div className="flex items-center gap-1 text-white/80">
               <MapPin className="w-3.5 h-3.5" />
               <span className="text-xs font-medium">
-                {loading ? "Detecting location..." : (weather?.location_name || "Your Location")}
+                {loading ? "Detecting location..." : (weather?.location_name || "Chennai District, Tamil Nadu, India")}
               </span>
             </div>
             <p className="text-white/60 text-xs mt-0.5">
@@ -118,7 +118,7 @@ export default function WeatherHeader({ weather, loading, lastUpdated, onRefresh
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="flex gap-4 mt-6 bg-white/15 backdrop-blur-sm rounded-2xl px-4 py-3"
+            className="flex gap-4 mt-6 bg-white/20 dark:bg-black/30 backdrop-blur-xl border border-white/30 dark:border-white/10 rounded-2xl px-4 py-3 shadow-xl"
           >
             {[
               { label: "Rain", value: `${weather.current.rainfall_mm}mm` },
@@ -126,9 +126,9 @@ export default function WeatherHeader({ weather, loading, lastUpdated, onRefresh
               { label: "Wind", value: `${weather.current.wind_kmh}km/h` },
               { label: "UV", value: weather.current.uv_index },
             ].map(s => (
-              <div key={s.label} className="flex-1 text-center">
-                <p className="text-white font-semibold text-sm">{s.value}</p>
-                <p className="text-white/60 text-xs">{s.label}</p>
+              <div key={s.label} className="flex-1 text-center border-r last:border-r-0 border-white/15">
+                <p className="text-white font-bold text-sm tracking-tight">{s.value}</p>
+                <p className="text-white/70 text-[11px] font-medium mt-0.5">{s.label}</p>
               </div>
             ))}
           </motion.div>

@@ -434,9 +434,39 @@ export const TRANSLATIONS = {
  * Falls back to English if the code or key is not found.
  */
 export function t(key, langCode = "en") {
+  if (!key) return "";
   const entry = TRANSLATIONS[key];
-  if (!entry) return key;
-  return entry[langCode] || entry["en"] || key;
+  if (entry) {
+    return entry[langCode] || entry["en"] || key;
+  }
+  const CROP_MAP = {
+    crop_rice: "Rice / Paddy", crop_wheat: "Wheat", crop_maize: "Maize / Corn",
+    crop_tomato: "Tomato", crop_potato: "Potato", crop_onion: "Onion",
+    crop_cotton: "Cotton", crop_sugarcane: "Sugarcane", crop_chili: "Pepper / Chili",
+    crop_banana: "Banana / Plantain", crop_mango: "Mango", crop_apple: "Apple",
+    crop_grape: "Grapes", crop_citrus: "Citrus (Lemon/Orange)", crop_papaya: "Papaya",
+    crop_guava: "Guava", crop_tea: "Tea", crop_coffee: "Coffee",
+    crop_groundnut: "Groundnut / Peanut", crop_soybean: "Soybean", crop_cucumber: "Cucumber",
+    crop_eggplant: "Eggplant / Brinjal", crop_sorghum: "Sorghum", crop_millet: "Millet", crop_cassava: "Cassava"
+  };
+  if (CROP_MAP[key]) return CROP_MAP[key];
+
+  const TAB_MAP = {
+    tab_scan: "Scan", tab_weather: "Weather", tab_market: "Market",
+    tab_alerts: "Alerts", tab_profile: "Profile", scan_title: "Plant Health Scan",
+    scan_tab_scan: "Scan Leaf", scan_history_title: "History",
+    market_title: "Mandi Market Prices", weather_title: "Weather Forecast",
+    alerts_title: "Alerts Center", cat_all: "All", cat_grain: "Grain",
+    cat_vegetable: "Vegetable", cat_fruit: "Fruit", cat_cash: "Cash Crop",
+    cat_root: "Root", cat_legume: "Legume", cat_oil: "Oil Crop"
+  };
+  if (TAB_MAP[key]) return TAB_MAP[key];
+
+  if (key.startsWith("crop_")) {
+    const raw = key.replace("crop_", "");
+    return raw.charAt(0).toUpperCase() + raw.slice(1);
+  }
+  return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
 /**

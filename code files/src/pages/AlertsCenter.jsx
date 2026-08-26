@@ -58,7 +58,7 @@ export default function AlertsCenter() {
     <div className="min-h-screen bg-[#f5f8f0]">
       {/* Header */}
       <div className="bg-[#1a5c2a] px-4 pt-4 pb-4 shadow-lg">
-        <div className="max-w-lg mx-auto">
+        <div className="w-full">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="relative">
@@ -105,7 +105,7 @@ export default function AlertsCenter() {
       <BottomNav />
 
       {/* Content */}
-      <div className="max-w-lg mx-auto pb-20 p-4">
+      <div className="w-full pb-20 p-4">
         {loading ? (
           <div className="space-y-3 pt-2">
             {[1, 2, 3, 4].map(i => (
