@@ -7,7 +7,7 @@ export default function FarmStatsGrid({ profile, user }) {
   const farmSize = profile?.farm_size
     ? `${profile.farm_size} ${t("profile_" + (profile.farm_size_unit || "acres"), langCode)}`
     : "—";
-  const region = profile?.region || profile?.country || "—";
+  const region = profile?.state || profile?.district || profile?.region || profile?.country || "—";
   const cropCount = profile?.primary_crops?.length ?? 0;
   const memberSince = user?.created_date
     ? new Date(user.created_date).getFullYear()

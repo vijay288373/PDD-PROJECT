@@ -2,7 +2,6 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { base44 } from "@/api/base44Client";
 import { useLang } from "@/lib/useLang.jsx";
 import { t } from "@/lib/i18n";
 
@@ -10,9 +9,9 @@ const FARM_TYPES = ["smallholder", "commercial", "organic"];
 
 export default function EditProfileModal({ profile, user, onSave, onClose }) {
   const [form, setForm] = useState({
-    name: profile?.name || user?.full_name || "",
-    region: profile?.region || "",
-    country: profile?.country || "",
+    name: profile?.full_name || profile?.name || user?.full_name || "",
+    region: profile?.state || profile?.region || "",
+    country: profile?.district || profile?.country || "",
     farm_size: profile?.farm_size || "",
     farm_size_unit: profile?.farm_size_unit || "acres",
     farming_type: profile?.farming_type || "smallholder",
@@ -22,18 +21,10 @@ export default function EditProfileModal({ profile, user, onSave, onClose }) {
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
-  const handleSave = async () => {
+  const handleSave = () => {
     setSaving(true);
-    try {
-      const uid = user?.email;
-      let updated;
-      if (profile?.id) {
-        updated = await base44.entities.FarmerProfile.update(profile.id, { ...form, farm_size: Number(form.farm_size) || 0 });
-      } else {
-        updated = await base44.entities.FarmerProfile.create({ uid, ...form, farm_size: Number(form.farm_size) || 0 });
-      }
-      onSave(updated);
-    } catch {}
+    // Instant save — parent handles local storage + cloud sync
+    onSave(form);
     setSaving(false);
   };
 
@@ -109,7 +100,7 @@ export default function EditProfileModal({ profile, user, onSave, onClose }) {
           disabled={saving}
           className="w-full mt-6 bg-[#1a5c2a] text-white py-3.5 rounded-2xl font-semibold disabled:opacity-60"
         >
-          {saving ? t("profile_saving", langCode) : t("btn_save", langCode)}
+          {saving ? "Saving…" : t("btn_save", langCode)}
         </button>
       </motion.div>
     </div>

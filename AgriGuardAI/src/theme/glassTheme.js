@@ -17,7 +17,7 @@ export const glassTheme = StyleSheet.create({
 
   // Dark variant of frosted card
   glassCardDark: {
-    backgroundColor: 'rgba(12, 38, 22, 0.7)',
+    backgroundColor: 'rgba(5, 46, 22, 0.7)',
     borderRadius: 22,
     borderWidth: 1.5,
     borderColor: 'rgba(74, 222, 128, 0.25)',
@@ -83,8 +83,8 @@ export const glassTheme = StyleSheet.create({
 });
 
 export const glassGradients = {
-  primary: ['#1a5c2a', '#2d7a40', '#12411d'],
+  primary: ['#052e16', '#166534', '#0a1e12'],
   cardHighlight: ['rgba(255,255,255,0.4)', 'rgba(255,255,255,0.1)'],
   badgeAccent: ['rgba(74, 222, 128, 0.3)', 'rgba(34, 197, 94, 0.15)'],
-  backgroundMesh: ['#0f2b15', '#1a5c2a', '#0d381e']
+  backgroundMesh: ['#052e16', '#166534', '#0a1e12']
 };

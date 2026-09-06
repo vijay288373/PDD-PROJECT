@@ -12,7 +12,7 @@ function getInitials(name) {
 
 export default function ProfileHeader({ user, profile, scanCount, onEdit }) {
   const { langCode } = useLang();
-  const displayName = user?.full_name || profile?.name || t("profile_farmer", langCode);
+  const displayName = profile?.full_name || user?.full_name || profile?.name || t("profile_farmer", langCode);
   
   const farmTypeKey = profile?.farming_type || "smallholder";
   const farmTypeLabel = t("profile_" + farmTypeKey, langCode);

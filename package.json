@@ -1,0 +1,13 @@
+{
+  "name": "agri-guard-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Agri Guard AI - Master Test Suite and Application",
+  "scripts": {
+    "test": "node scripts/run_mock_suite.js",
+    "compile": "node scripts/compile-master.js"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0"
+  }
+}

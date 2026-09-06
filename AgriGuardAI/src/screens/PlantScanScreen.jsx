@@ -290,7 +290,7 @@ If it is a nutritional deficiency, specify the exact nutrient supplement, quanti
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#020617',
+    backgroundColor: '#052e16',
   },
   header: {
     paddingHorizontal: 16,
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justify: 'space-between',
     borderBottomWidth: 1,
-    borderBottomColor: '#1e293b',
+    borderBottomColor: '#14532d',
   },
   headerTitleRow: {
     flexDirection: 'row',
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   },
   tabToggle: {
     flexDirection: 'row',
-    backgroundColor: '#0f172a',
+    backgroundColor: '#0a1e12',
     borderRadius: 8,
     padding: 2,
   },

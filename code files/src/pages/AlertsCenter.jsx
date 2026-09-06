@@ -55,9 +55,9 @@ export default function AlertsCenter() {
   });
 
   return (
-    <div className="min-h-screen bg-[#f5f8f0]">
+    <div className="min-h-screen bg-[#f0fdf4]">
       {/* Header */}
-      <div className="bg-[#1a5c2a] px-4 pt-4 pb-4 shadow-lg">
+      <div className="bg-gradient-to-r from-[#052e16] to-[#166534] px-4 pt-4 pb-4 shadow-lg">
         <div className="w-full">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">

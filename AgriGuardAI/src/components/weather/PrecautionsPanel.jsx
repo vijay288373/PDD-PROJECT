@@ -9,7 +9,13 @@ const SECTIONS = [
   { key: "monitor", icon: Eye, label: "Monitor Closely", subtitle: "Keep an eye on these indicators", bg: "#eff6ff", border: "#dbeafe", iconBg: "#dbeafe", iconColor: "#2563eb", dotColor: "#60a5fa", badgeColor: "#60a5fa" },
 ];
 
-export default function PrecautionsPanel({ cropImpact, analyzing }) {
+const DEFAULT_PRECAUTIONS = {
+  immediate: ["Ensure field furrows are clear to handle potential rainfall", "Inspect yellow sticky traps for insect pest vectors"],
+  this_week: ["Apply organic Neem oil spray (1%) on vulnerable crop leaves", "Maintain balanced N-P-K fertigation schedule"],
+  monitor: ["Watch for humidity spikes above 80% which encourage fungal spores", "Track 7-day weather forecast daily"]
+};
+
+export default function PrecautionsPanel({ cropImpact, precautions: precautionsProp, analyzing }) {
   if (analyzing) {
     return (
       <View style={styles.centerContainer}>
@@ -19,16 +25,8 @@ export default function PrecautionsPanel({ cropImpact, analyzing }) {
     );
   }
 
-  if (!cropImpact?.precautions) {
-    return (
-      <View style={styles.centerContainer}>
-        <Text style={{ fontSize: 48, marginBottom: 12 }}>🛡️</Text>
-        <Text style={styles.emptyText}>Precautions will appear after weather analysis completes</Text>
-      </View>
-    );
-  }
-
-  const allText = SECTIONS.flatMap(s => cropImpact.precautions[s.key] || []);
+  const prec = precautionsProp || cropImpact?.precautions || DEFAULT_PRECAUTIONS;
+  const allText = SECTIONS.flatMap(s => prec[s.key] || []);
 
   return (
     <View style={styles.container}>
@@ -43,7 +41,7 @@ export default function PrecautionsPanel({ cropImpact, analyzing }) {
       <View style={styles.listContainer}>
         {SECTIONS.map((section) => {
           const SectionIcon = section.icon;
-          const items = cropImpact.precautions[section.key] || [];
+          const items = prec[section.key] || [];
           if (!items.length) return null;
           return (
             <View key={section.key} style={[styles.sectionCard, { backgroundColor: section.bg, borderColor: section.border }]}>

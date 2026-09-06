@@ -3,47 +3,64 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AuthContext = createContext();
 
+const SUPA_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://ptnlnpcycionjciuodep.supabase.co';
+const SUPA_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_DTMpMtKdF346pVGIQ8XMjw_FAeBcaIz';
+const isSupabase = !!(SUPA_URL && SUPA_KEY && SUPA_KEY.length > 10);
+
+function supaHeaders() {
+  return {
+    apikey: SUPA_KEY,
+    Authorization: `Bearer ${SUPA_KEY}`,
+    'Content-Type': 'application/json',
+    Prefer: 'return=representation',
+  };
+}
+
+async function supaFindUser(email) {
+  if (!isSupabase) return null;
+  try {
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/UserAccount?email=eq.${encodeURIComponent(email.toLowerCase())}&limit=1`,
+      { headers: supaHeaders() }
+    );
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return rows[0] || null;
+  } catch (err) {
+    console.warn('Mobile supaFindUser failed:', err.message);
+    return null;
+  }
+}
+
+async function supaCreateUser(userData) {
+  if (!isSupabase) return null;
+  const res = await fetch(`${SUPA_URL}/rest/v1/UserAccount`, {
+    method: 'POST',
+    headers: supaHeaders(),
+    body: JSON.stringify(userData),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error('Mobile supaCreateUser failed:', res.status, errText);
+    throw new Error(`Cloud user creation failed (${res.status}): ${errText}`);
+  }
+  const rows = await res.json();
+  return rows[0] || userData;
+}
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(false);
   const [authError, setAuthError] = useState(null);
-  const [authChecked, setAuthChecked] = useState(false);
-  const [appPublicSettings, setAppPublicSettings] = useState({ id: 'local', public_settings: {} });
-
-  // Seed default farmer credentials in AsyncStorage on load if missing
-  useEffect(() => {
-    const seed = async () => {
-      try {
-        const db = await AsyncStorage.getItem('users_database');
-        if (!db) {
-          const defaultUsers = [
-            {
-              id: 'demo-farmer-id',
-              full_name: 'Demo Farmer',
-              email: 'farmer@agriguard.com',
-              password: 'password123',
-              region: 'Punjab, India',
-              crops: ['Wheat', 'Rice']
-            }
-          ];
-          await AsyncStorage.setItem('users_database', JSON.stringify(defaultUsers));
-        }
-      } catch (e) {
-        console.error('Failed to seed users database:', e);
-      }
-    };
-    seed();
-  }, []);
 
   useEffect(() => {
     const init = async () => {
       try {
         const storedUser = await AsyncStorage.getItem('local_user');
-        const isLoggedIn = await AsyncStorage.getItem('is_logged_in') === 'true';
-        
-        if (isLoggedIn && storedUser && storedUser !== 'null' && storedUser !== 'undefined') {
+        const isLoggedIn = (await AsyncStorage.getItem('is_logged_in')) === 'true';
+
+        if (isLoggedIn && storedUser && storedUser !== 'null') {
           const parsed = JSON.parse(storedUser);
           setUser(parsed);
           setIsAuthenticated(true);
@@ -57,7 +74,6 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(false);
       } finally {
         setIsLoadingAuth(false);
-        setAuthChecked(true);
       }
     };
     init();
@@ -65,82 +81,96 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     setAuthError(null);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 800));
+    const cleanEmail = email.trim().toLowerCase();
 
-      const dbRaw = await AsyncStorage.getItem('users_database');
-      const users = dbRaw ? JSON.parse(dbRaw) : [];
-      const foundUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    // 1. Try Supabase cloud auth check first
+    let foundUser = await supaFindUser(cleanEmail);
 
-      if (!foundUser) {
-        throw new Error('No account found with this email. Please sign up!');
-      }
-
-      if (foundUser.password !== password) {
-        throw new Error('Incorrect password. Please try again.');
-      }
-
-      const loggedUser = {
-        id: foundUser.id,
-        email: foundUser.email,
-        full_name: foundUser.full_name,
-        region: foundUser.region || 'Not Specified',
-        crops: foundUser.crops || []
-      };
-
-      setUser(loggedUser);
-      setIsAuthenticated(true);
-      await AsyncStorage.setItem('local_user', JSON.stringify(loggedUser));
-      await AsyncStorage.setItem('is_logged_in', 'true');
-      return { success: true };
-    } catch (e) {
-      setAuthError({ type: 'login_error', message: e.message });
-      throw e;
+    // 2. Fallback to AsyncStorage database if offline or user not in cloud
+    if (!foundUser) {
+      try {
+        const dbRaw = await AsyncStorage.getItem('users_database');
+        const users = dbRaw ? JSON.parse(dbRaw) : [];
+        foundUser = users.find(u => u.email.toLowerCase() === cleanEmail);
+      } catch {}
     }
+
+    if (!foundUser) {
+      throw new Error('No account found with this email. Please sign up!');
+    }
+
+    if (foundUser.password !== password) {
+      throw new Error('Incorrect password. Please try again.');
+    }
+
+    const loggedUser = {
+      id: foundUser.id,
+      email: foundUser.email,
+      full_name: foundUser.full_name,
+      region: foundUser.region || 'Not Specified',
+      crops: foundUser.crops || [],
+    };
+
+    setUser(loggedUser);
+    setIsAuthenticated(true);
+    await AsyncStorage.setItem('local_user', JSON.stringify(loggedUser));
+    await AsyncStorage.setItem('is_logged_in', 'true');
+    return { success: true };
   };
 
   const register = async (fullName, email, password) => {
     setAuthError(null);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 800));
+    const cleanEmail = email.trim().toLowerCase();
 
+    // Check if account exists in Supabase
+    let exists = await supaFindUser(cleanEmail);
+
+    if (!exists) {
+      try {
+        const dbRaw = await AsyncStorage.getItem('users_database');
+        const users = dbRaw ? JSON.parse(dbRaw) : [];
+        exists = users.some(u => u.email.toLowerCase() === cleanEmail);
+      } catch {}
+    }
+
+    if (exists) {
+      throw new Error('An account already exists with this email.');
+    }
+
+    const userId = 'user_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    const newUser = {
+      id: userId,
+      full_name: fullName,
+      email: cleanEmail,
+      password: password,
+      region: 'Not Specified',
+      crops: [],
+    };
+
+    // Save to Supabase Cloud
+    await supaCreateUser(newUser);
+
+    // Save to local storage as fallback
+    try {
       const dbRaw = await AsyncStorage.getItem('users_database');
       const users = dbRaw ? JSON.parse(dbRaw) : [];
-      const exists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
-
-      if (exists) {
-        throw new Error('An account already exists with this email.');
-      }
-
-      const newUser = {
-        id: 'user_' + Math.random().toString(36).slice(2) + Date.now().toString(36),
-        full_name: fullName,
-        email: email,
-        password: password,
-        region: 'Not Specified',
-        crops: []
-      };
-
       users.push(newUser);
       await AsyncStorage.setItem('users_database', JSON.stringify(users));
+    } catch {}
 
-      const loggedUser = {
-        id: newUser.id,
-        email: newUser.email,
-        full_name: newUser.full_name,
-        region: newUser.region,
-        crops: newUser.crops
-      };
+    const loggedUser = {
+      id: newUser.id,
+      email: newUser.email,
+      full_name: newUser.full_name,
+      region: newUser.region,
+      crops: newUser.crops,
+    };
 
-      setUser(loggedUser);
-      setIsAuthenticated(true);
-      await AsyncStorage.setItem('local_user', JSON.stringify(loggedUser));
-      await AsyncStorage.setItem('is_logged_in', 'true');
-      return { success: true };
-    } catch (e) {
-      setAuthError({ type: 'register_error', message: e.message });
-      throw e;
-    }
+    setUser(loggedUser);
+    setIsAuthenticated(true);
+    await AsyncStorage.setItem('local_user', JSON.stringify(loggedUser));
+    await AsyncStorage.setItem('is_logged_in', 'true');
+    return { success: true };
   };
 
   const logout = async () => {
@@ -156,14 +186,6 @@ export const AuthProvider = ({ children }) => {
 
   const deleteAccount = async () => {
     try {
-      if (user?.email) {
-        const dbRaw = await AsyncStorage.getItem('users_database');
-        if (dbRaw) {
-          const users = JSON.parse(dbRaw);
-          const filtered = users.filter(u => u.email.toLowerCase() !== user.email.toLowerCase());
-          await AsyncStorage.setItem('users_database', JSON.stringify(filtered));
-        }
-      }
       await AsyncStorage.removeItem('local_user');
       await AsyncStorage.setItem('is_logged_in', 'false');
       await AsyncStorage.removeItem('agriguard_profile');
@@ -175,39 +197,16 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
-  const navigateToLogin = () => {
-    setIsAuthenticated(false);
-  };
-
-  const checkUserAuth = async () => {
-    const storedUser = await AsyncStorage.getItem('local_user');
-    const isLoggedIn = await AsyncStorage.getItem('is_logged_in') === 'true';
-    if (isLoggedIn && storedUser) {
-      setUser(JSON.parse(storedUser));
-      setIsAuthenticated(true);
-    }
-  };
-
-  const checkAppState = async () => {
-    await checkUserAuth();
-  };
-
   return (
     <AuthContext.Provider value={{
       user,
       isAuthenticated,
       isLoadingAuth,
-      isLoadingPublicSettings,
       authError,
-      appPublicSettings,
-      authChecked,
       login,
       register,
       logout,
       deleteAccount,
-      navigateToLogin,
-      checkUserAuth,
-      checkAppState
     }}>
       {children}
     </AuthContext.Provider>

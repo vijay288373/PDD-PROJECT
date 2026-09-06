@@ -1,12 +1,14 @@
 export const colors = {
-  primary: '#1a5c2a',
-  primaryLight: '#2d7a40',
+  primary: '#166534',
+  primaryLight: '#22c55e',
   accent: '#4ade80',
   accentLight: '#a7f3c8',
-  background: '#f5f8f0',
+  accent: '#f59e0b',
+  accentLight: '#fbbf24',
+  background: '#f0fdf4',
   card: '#ffffff',
-  border: '#e8f5e9',
-  borderLight: '#c8e6c9',
+  border: '#dcfce7',
+  borderLight: '#bbf7d0',
   text: '#1f2937',
   textSecondary: '#6b7280',
   textMuted: '#9ca3af',
@@ -24,10 +26,10 @@ export const colors = {
   
   // Dark mode variants (optional usage)
   dark: {
-    background: '#121212',
-    card: '#1e1e1e',
+    background: '#052e16',
+    card: '#0a1e12',
     text: '#e5e7eb',
     textSecondary: '#9ca3af',
-    border: '#374151',
+    border: '#14532d',
   }
 };

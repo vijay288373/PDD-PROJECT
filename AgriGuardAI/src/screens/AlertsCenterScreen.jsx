@@ -2,6 +2,19 @@ import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, FlatList } from "react-native";
 import { Bell, CheckCheck } from "lucide-react-native";
 import AlertCard from "../components/alerts/AlertCard";
+import { useAuth } from "../lib/AuthContext";
+
+const SUPA_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://ptnlnpcycionjciuodep.supabase.co';
+const SUPA_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_DTMpMtKdF346pVGIQ8XMjw_FAeBcaIz';
+
+function supaHeaders() {
+  return {
+    apikey: SUPA_KEY,
+    Authorization: `Bearer ${SUPA_KEY}`,
+    'Content-Type': 'application/json',
+    Prefer: 'return=representation',
+  };
+}
 
 const FILTER_TABS = [
   { id: "filter_all", label: "All" },
@@ -19,31 +32,73 @@ const TAB_TYPE_MAP = {
   filter_scans: "scan",
 };
 
-// Mock data integration
-const mockFetchAlerts = async () => [
-  { id: "1", type: "critical", title: "Pest Attack Risk", body: "High risk of Fall Armyworm detected in your region.", read: false, created_date: new Date().toISOString() },
-  { id: "2", type: "market", title: "Price Spike", body: "Tomato prices are up 5% today.", read: true, created_date: new Date().toISOString() },
-  { id: "3", type: "weather", title: "Heavy Rain Expected", body: "Expect heavy rainfall tomorrow evening.", read: false, created_date: new Date().toISOString() },
+const DEFAULT_ALERTS = [
+  { id: "1", type: "critical", title: "Pest Attack Risk", body: "High risk of Fall Armyworm detected in your region.", is_read: false, created_date: new Date().toISOString() },
+  { id: "2", type: "market", title: "Price Spike", body: "Tomato prices are up 5% today.", is_read: true, created_date: new Date().toISOString() },
+  { id: "3", type: "weather", title: "Heavy Rain Expected", body: "Expect heavy rainfall tomorrow evening.", is_read: false, created_date: new Date().toISOString() },
 ];
 
+async function fetchSupaAlerts(uid) {
+  if (!uid) return null;
+  try {
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/Alert?uid=eq.${encodeURIComponent(uid)}&order=created_date.desc&limit=50`,
+      { headers: supaHeaders() }
+    );
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return rows;
+  } catch {
+    return null;
+  }
+}
+
+async function updateSupaAlertRead(id) {
+  try {
+    await fetch(`${SUPA_URL}/rest/v1/Alert?id=eq.${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      headers: supaHeaders(),
+      body: JSON.stringify({ is_read: true }),
+    });
+  } catch {}
+}
+
 export default function AlertsCenterScreen({ navigation }) {
+  const { user } = useAuth();
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState("filter_all");
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await mockFetchAlerts();
-        setAlerts(data);
-      } catch (e) {}
-      setLoading(false);
-    };
     loadData();
-  }, []);
+  }, [user]);
 
-  const markAllRead = () => {
-    setAlerts(prev => prev.map(a => ({ ...a, read: true })));
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const userEmail = user?.email || 'farmer@agriguard.com';
+      const cloudAlerts = await fetchSupaAlerts(userEmail);
+      if (cloudAlerts && cloudAlerts.length > 0) {
+        setAlerts(cloudAlerts.map(a => ({
+          ...a,
+          body: a.message || a.body,
+          read: a.is_read !== undefined ? a.is_read : a.read,
+        })));
+      } else {
+        setAlerts(DEFAULT_ALERTS.map(a => ({ ...a, read: a.is_read })));
+      }
+    } catch (e) {
+      setAlerts(DEFAULT_ALERTS.map(a => ({ ...a, read: a.is_read })));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const markAllRead = async () => {
+    setAlerts(prev => prev.map(a => ({ ...a, read: true, is_read: true })));
+    alerts.forEach(a => {
+      if (a.id && !a.id.length < 5) updateSupaAlertRead(a.id);
+    });
   };
 
   const unreadCount = alerts.filter(a => !a.read).length;
@@ -100,7 +155,7 @@ export default function AlertsCenterScreen({ navigation }) {
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#1a5c2a" style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color="#166534" style={{ marginTop: 40 }} />
       ) : filtered.length === 0 ? (
         <View style={styles.emptyState}>
           <Bell color="#e5e7eb" size={48} style={{ marginBottom: 16 }} />
@@ -118,7 +173,8 @@ export default function AlertsCenterScreen({ navigation }) {
             <AlertCard 
               alert={item} 
               onPress={(alertItem) => {
-                setAlerts(prev => prev.map(a => a.id === alertItem.id ? { ...a, read: true } : a));
+                setAlerts(prev => prev.map(a => a.id === alertItem.id ? { ...a, read: true, is_read: true } : a));
+                if (alertItem.id) updateSupaAlertRead(alertItem.id);
                 if (alertItem.type === "critical" || alertItem.type === "scan") {
                   navigation?.navigate("Scan");
                 } else if (alertItem.type === "market") {
@@ -138,10 +194,10 @@ export default function AlertsCenterScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f8f0",
+    backgroundColor: "#f0fdf4",
   },
   header: {
-    backgroundColor: "#1a5c2a",
+    backgroundColor: "#166534",
     paddingTop: 48,
     paddingBottom: 16,
   },

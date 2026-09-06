@@ -1,9 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
 import { CheckCircle, AlertTriangle, Clock, Leaf } from 'lucide-react-native';
-import { base44 } from '../../api/base44Client';
+import { useAuth } from '../../lib/AuthContext';
 import { useLang } from '../../lib/useLang';
 import { t } from '../../lib/i18n';
+
+const SUPA_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://ptnlnpcycionjciuodep.supabase.co';
+const SUPA_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_DTMpMtKdF346pVGIQ8XMjw_FAeBcaIz';
+
+function supaHeaders() {
+  return {
+    apikey: SUPA_KEY,
+    Authorization: `Bearer ${SUPA_KEY}`,
+    'Content-Type': 'application/json',
+    Prefer: 'return=representation',
+  };
+}
+
+async function fetchSupaScans(uid) {
+  if (!uid) return [];
+  try {
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/ScanHistory?uid=eq.${encodeURIComponent(uid)}&order=created_date.desc&limit=30`,
+      { headers: supaHeaders() }
+    );
+    if (!res.ok) return [];
+    const rows = await res.json();
+    return rows;
+  } catch {
+    return [];
+  }
+}
 
 const CROP_KEYS = {
   "Rice": "crop_rice",
@@ -20,32 +47,35 @@ const CROP_KEYS = {
 
 const SEVERITY_LABELS = {
   mild: { en: "Mild", hi: "हल्का", ta: "லேசான", te: "తేలికపాటి", es: "Leve" },
-  moderate: { en: "Moderate", hi: "मध्यम", ta: "மிதமான", te: "మితమైన", es: "Moderado" },
+  moderate: { en: "Moderate", hi: "मध्यम", ta: "மிதமான", te: "மితమైన", es: "Moderado" },
   severe: { en: "Severe", hi: "गंभीर", ta: "கடுமையான", te: "తీవ్రమైన", es: "Grave" },
   none: { en: "None", hi: "कोई नहीं", ta: "ஏதுமில்லை", te: "ఏమీ లేదు", es: "Ninguna" }
 };
 
 const LOCAL_TEXTS = {
-  no_scans: { en: "No Scans Yet", hi: "अभी तक कोई स्कैन नहीं", ta: "இன்னும் ஸ்கேன்கள் இல்லை", te: "ఇంకా స్కాన్‌లు లేవు", es: "No hay escaneos todavía" },
+  no_scans: { en: "No Scans Yet", hi: "अभी तक कोई स्कैन नहीं", ta: "இன்னும் ஸ்கேன்கள் இல்லை", te: "இంకా స్కాన్‌లు లేవు", es: "No hay escaneos todavía" },
   no_scans_desc: { en: "Start scanning your crops to build your history", hi: "इतिहास बनाने के लिए अपनी फसलों को स्कैन करना शुरू करें", ta: "வரலாற்றை உருவாக்க உங்கள் பயிர்களை ஸ்கேன் செய்யத் தொடங்குங்கள்", te: "మీ చరిత్రను రూపొందించడానికి మీ పంటలను స్కాన్ చేయడం ప్రారంభించండి", es: "Comience a escanear sus cultivos para crear su historial" },
   healthy: { en: "Healthy", hi: "स्वस्थ", ta: "ஆரோக்கியமானது", te: "ఆరోగ్యకరమైనది", es: "Sana" }
 };
 
 export default function ScanHistory({ onSelectScan }) {
+  const { user } = useAuth();
   const [scans, setScans] = useState([]);
   const [loading, setLoading] = useState(true);
   const { langCode } = useLang();
 
   useEffect(() => {
     const loadScans = async () => {
+      setLoading(true);
       try {
-        const data = await base44.entities.ScanHistory.list("-created_date", 20);
+        const userEmail = user?.email || 'farmer@agriguard.com';
+        const data = await fetchSupaScans(userEmail);
         setScans(data);
       } catch {}
       setLoading(false);
     };
     loadScans();
-  }, []);
+  }, [user]);
 
   const formatDate = (dateStr) => {
     if (!dateStr) return "—";
@@ -83,10 +113,8 @@ export default function ScanHistory({ onSelectScan }) {
     const severityText = SEVERITY_LABELS[scan.severity]?.[langCode] || SEVERITY_LABELS[scan.severity]?.["en"] || scan.severity;
 
     return (
-      <TouchableOpacity 
+      <View 
         style={styles.card}
-        activeOpacity={0.7}
-        onPress={() => onSelectScan?.(scan)}
       >
         {scan.image_url ? (
           <Image source={{ uri: scan.image_url }} style={styles.cardImage} />
@@ -140,7 +168,7 @@ export default function ScanHistory({ onSelectScan }) {
             </View>
           )}
         </View>
-      </TouchableOpacity>
+      </View>
     );
   };
 

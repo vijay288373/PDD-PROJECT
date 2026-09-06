@@ -584,12 +584,12 @@ export default function CropGrowthAdvisor() {
   useEffect(() => { if (advisory) setLoading(false); }, [advisory]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-900 to-violet-900">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-[#052e16] via-[#14532d] to-[#166534]">
       <div className="flex-1 overflow-y-auto pb-24">
         {/* Header */}
         <div className="px-4 pt-12 pb-6">
           <h1 className="text-2xl font-bold text-white">🌱 Crop Growth Advisor</h1>
-          <p className="text-indigo-300 text-sm mt-1">Stage-wise fertilizer, pesticide & nutrition guide</p>
+          <p className="text-emerald-300 text-sm mt-1">Stage-wise fertilizer, pesticide & nutrition guide</p>
         </div>
 
         {/* Setup */}
@@ -598,21 +598,21 @@ export default function CropGrowthAdvisor() {
           <select
             value={selectedCrop}
             onChange={e => setSelectedCrop(e.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 font-medium bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-800 font-medium bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-400"
           >
             <option value="">-- Select a crop --</option>
             {CROPS.map(c => <option key={c} value={c}>{CROP_EMOJI[c] || '🌿'} {c}</option>)}
           </select>
 
           <label className="block text-sm font-semibold text-gray-700 mt-4 mb-2">Growth Stage</label>
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 w-full">
             {GROWTH_STAGES.map(stage => (
               <button
                 key={stage.id}
                 onClick={() => setSelectedStage(stage)}
-                className={`flex-shrink-0 flex flex-col items-center p-3 rounded-xl border-2 transition-all min-w-[90px] ${
+                className={`flex-1 flex-shrink-0 flex flex-col items-center p-3 rounded-xl border-2 transition-all min-w-[90px] ${
                   selectedStage?.id === stage.id
-                    ? 'border-indigo-500 bg-indigo-600 text-white'
+                    ? 'border-emerald-500 bg-emerald-600 text-white'
                     : 'border-gray-200 bg-gray-50 text-gray-700'
                 }`}
               >
@@ -627,19 +627,19 @@ export default function CropGrowthAdvisor() {
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Field Size (acres)</label>
               <input type="number" value={fieldSize} onChange={e => { setFieldSize(e.target.value); localStorage.setItem('agriguard_field_size', e.target.value); }}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400" placeholder="2.5" />
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" placeholder="2.5" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-gray-600 mb-1">Tank Capacity (L)</label>
               <input type="number" value={tankCapacity} onChange={e => setTankCapacity(e.target.value)}
-                className="w-full border border-gray-200 rounded-xl px-3 py-2 font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-400" placeholder="15" />
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-emerald-400" placeholder="15" />
             </div>
           </div>
 
           <button
             onClick={fetchAdvisory}
             disabled={!selectedCrop || !selectedStage || loading}
-            className="w-full mt-4 py-3 bg-indigo-600 disabled:bg-indigo-300 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-indigo-700 transition-colors"
+            className="w-full mt-4 py-3 bg-emerald-600 disabled:bg-emerald-300 text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-emerald-700 transition-colors"
           >
             {loading ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <><BookOpen className="w-4 h-4" /><span>Get Growth Advisory</span></>}
           </button>
@@ -649,14 +649,14 @@ export default function CropGrowthAdvisor() {
         {advisory && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mx-4">
             <h2 className="text-white font-bold text-lg mb-1">{CROP_EMOJI[selectedCrop] || '🌿'} {selectedCrop} – {selectedStage?.label}</h2>
-            <p className="text-indigo-300 text-xs mb-4">Field: {fieldSize} acres · Tank: {tankCapacity}L</p>
+            <p className="text-emerald-300 text-xs mb-4">Field: {fieldSize} acres · Tank: {tankCapacity}L</p>
 
             {/* Tabs */}
             <div className="flex bg-white/10 rounded-xl p-1 mb-4">
               {[{id: 'fertilizer', label: '🌿 Fertilizer'}, {id: 'pesticide', label: '🐛 Pesticide'}, {id: 'nutrient', label: '💧 Nutrition'}].map(tab => (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id)}
                   className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-all ${
-                    activeTab === tab.id ? 'bg-white text-indigo-700 shadow' : 'text-white/70'
+                    activeTab === tab.id ? 'bg-white text-emerald-700 shadow' : 'text-white/70'
                   }`}>{tab.label}</button>
               ))}
             </div>

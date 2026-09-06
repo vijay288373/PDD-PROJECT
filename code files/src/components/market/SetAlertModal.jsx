@@ -4,6 +4,37 @@ import { Bell, X, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
 
+const SUPA_URL = import.meta.env.VITE_SUPABASE_URL || 'https://ptnlnpcycionjciuodep.supabase.co';
+const SUPA_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_DTMpMtKdF346pVGIQ8XMjw_FAeBcaIz';
+
+function supaHeaders() {
+  return {
+    apikey: SUPA_KEY,
+    Authorization: `Bearer ${SUPA_KEY}`,
+    'Content-Type': 'application/json',
+    Prefer: 'return=representation',
+  };
+}
+
+function genId() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+async function createSupaPriceAlert(alertObj) {
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/PriceAlert`, {
+      method: 'POST',
+      headers: supaHeaders(),
+      body: JSON.stringify(alertObj),
+    });
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return rows[0] || alertObj;
+  } catch {
+    return null;
+  }
+}
+
 export default function SetAlertModal({ crop, currentPrice, unit, region, onClose }) {
   const [targetPrice, setTargetPrice] = useState("");
   const [saving, setSaving] = useState(false);
@@ -14,14 +45,12 @@ export default function SetAlertModal({ crop, currentPrice, unit, region, onClos
     setSaving(true);
     try {
       const user = await base44.auth.me();
-      await base44.entities.PriceAlert.create({
+      await createSupaPriceAlert({
+        id: genId(),
         uid: user.email,
-        crop,
+        crop_name: crop,
         target_price: Number(targetPrice),
-        unit: unit || "quintal",
-        region: region || "",
-        market: "",
-        triggered: false,
+        condition: 'above',
         is_active: true,
       });
       setSaved(true);

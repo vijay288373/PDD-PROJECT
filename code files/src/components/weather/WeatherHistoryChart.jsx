@@ -31,7 +31,7 @@ export default function WeatherHistoryChart({ location }) {
         const lat = location?.latitude || 20.5937;
         const lon = location?.longitude || 78.9629;
 
-        const result = await base44.integrations.Core.InvokeLLM({
+        const raw = await base44.integrations.Core.InvokeLLM({
           prompt: `Generate realistic historical weather data for the past 30 days for coordinates: lat ${lat.toFixed(2)}, lon ${lon.toFixed(2)}.
 Today is ${new Date().toDateString()}.
 
@@ -50,7 +50,13 @@ The history array must have exactly 30 items, oldest first (30 days ago to today
           }
         });
 
-        setData(result.history || []);
+        const cleaned = typeof raw === 'string' ? raw.replace(/```json/gi, '').replace(/```/g, '').trim() : raw;
+        const result = typeof cleaned === 'string' ? JSON.parse(cleaned) : cleaned;
+        if (result?.history?.length > 0) {
+          setData(result.history);
+        } else {
+          throw new Error("No history data");
+        }
       } catch {
         // Fallback: generate fake data
         const fake = Array.from({ length: 30 }, (_, i) => ({

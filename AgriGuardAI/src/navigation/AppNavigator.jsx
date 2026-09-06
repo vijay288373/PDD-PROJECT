@@ -36,7 +36,7 @@ function MainTabs() {
           bottom: Platform.OS === 'ios' ? 24 : 16,
           left: 10,
           right: 10,
-          backgroundColor: 'rgba(15, 30, 20, 0.92)',
+          backgroundColor: 'rgba(5, 46, 22, 0.95)',
           borderRadius: 24,
           borderWidth: 1.5,
           borderColor: 'rgba(74, 222, 128, 0.25)',
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#0a1e12',
+    backgroundColor: '#052e16',
   },
   iconWrapper: {
     alignItems: 'center',

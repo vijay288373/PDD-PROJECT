@@ -30,3 +30,7 @@ Thumbs.db
 *.apk
 app-debug.apk
 
+# Temporary scratch directory
+scratch/
+
+

@@ -253,7 +253,7 @@ export default function LoginScreen() {
       style={styles.container}
     >
       <LinearGradient
-        colors={['#022c22', '#0f766e', '#020617']}
+        colors={['#022c22', '#0f766e', '#052e16']}
         style={StyleSheet.absoluteFill}
       />
       
@@ -277,7 +277,7 @@ export default function LoginScreen() {
                 colors={['#10b981', '#4ade80']}
                 style={styles.logoGradient}
               >
-                <Sprout color="#0f172a" size={32} />
+                <Sprout color="#0a1e12" size={32} />
               </LinearGradient>
             </View>
             <Text style={styles.appName}>{t("app_name", langCode) || 'Agri Guard AI'}</Text>
@@ -394,10 +394,10 @@ export default function LoginScreen() {
                 style={styles.submitGradient}
               >
                 {isLoading ? (
-                  <ActivityIndicator color="#0f172a" />
+                  <ActivityIndicator color="#0a1e12" />
                 ) : (
                   <>
-                    <Sparkles color="#0f172a" size={20} />
+                    <Sparkles color="#0a1e12" size={20} />
                     <Text style={styles.submitText}>
                       {isSignIn ? (t("sign_in_to_farm", langCode) || 'Sign In to Farm') : (t("create_account", langCode) || 'Create Account')}
                     </Text>
@@ -452,7 +452,7 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#020617' },
+  container: { flex: 1, backgroundColor: '#052e16' },
   ambientLight: { position: 'absolute', width: 300, height: 300, borderRadius: 150, backgroundColor: 'rgba(16, 185, 129, 0.1)', zIndex: 0 },
   ambientLightTop: { top: '10%', left: '10%' },
   ambientLightBottom: { bottom: '10%', right: '10%' },
@@ -467,7 +467,7 @@ const styles = StyleSheet.create({
   activeTabIndicator: { position: 'absolute', top: 4, bottom: 4, width: '48%', backgroundColor: '#10b981', borderRadius: 8, zIndex: 1 },
   tabButton: { flex: 1, paddingVertical: 10, alignItems: 'center', zIndex: 2 },
   tabText: { fontSize: 14, fontWeight: '600' },
-  activeTabText: { color: '#0f172a' },
+  activeTabText: { color: '#0a1e12' },
   inactiveTabText: { color: '#94a3b8' },
   errorContainer: { flexDirection: 'row', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderWidth: 1, borderColor: 'rgba(239, 68, 68, 0.2)', borderRadius: 12, padding: 12, marginBottom: 20, alignItems: 'center' },
   errorText: { color: '#ef4444', fontSize: 14, marginLeft: 8, flex: 1 },
@@ -482,7 +482,7 @@ const styles = StyleSheet.create({
   eyeIcon: { position: 'absolute', right: 12, zIndex: 1 },
   submitBtn: { borderRadius: 12, overflow: 'hidden', marginTop: 8, shadowColor: '#10b981', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 4 },
   submitGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 16, gap: 8 },
-  submitText: { color: '#0f172a', fontSize: 16, fontWeight: '700' },
+  submitText: { color: '#0a1e12', fontSize: 16, fontWeight: '700' },
   dividerContainer: { flexDirection: 'row', alignItems: 'center', marginVertical: 24 },
   dividerLine: { flex: 1, height: 1, backgroundColor: 'rgba(255,255,255,0.1)' },
   dividerText: { color: '#64748b', fontSize: 10, fontWeight: '600', paddingHorizontal: 12, backgroundColor: 'transparent' },

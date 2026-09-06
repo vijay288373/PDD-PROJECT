@@ -53,8 +53,8 @@ const auth = {
   redirectToLogin: () => {},
 };
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://ptnlnpcycionjciuodep.supabase.co';
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_DTMpMtKdF346pVGIQ8XMjw_FAeBcaIz';
 
 function isValidEnvVar(val) {
   return val && val !== 'undefined' && val !== 'null' && val.trim().length > 5;
@@ -451,17 +451,17 @@ function getFallbackResponse(prompt, file_urls = []) {
       'soybean': 4400, 'chili': 4500, 'turmeric': 7800, 'watermelon': 2016
     };
 
-    function getHourlyRandomSeed() {
-      return Math.floor(Date.now() / (30 * 60 * 1000));
+    function getDailyRandomSeed() {
+      return Math.floor(Date.now() / (24 * 60 * 60 * 1000));
     }
-    const hourSeed = getHourlyRandomSeed();
+    const daySeed = getDailyRandomSeed();
     const prices = {};
     cropNames.forEach(c => {
       const k = c.toLowerCase().split(' ')[0];
       const base = defaultRates[k] || defaultRates[c.toLowerCase()] || 2000;
-      // Per-crop unique randomness that changes hourly
+      // Per-crop unique randomness that changes daily
       const cropSeed = c.split('').reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
-      const rand = Math.round(Math.sin(cropSeed * 0.17 + hourSeed * 0.41) * 120);
+      const rand = Math.round(Math.sin(cropSeed * 0.17 + daySeed * 0.41) * 120);
       const modal = base + rand;
       prices[c] = {
         modal_price: modal,
@@ -643,12 +643,12 @@ function getFallbackResponse(prompt, file_urls = []) {
         {
           market_name: "Koyambedu Wholesale Market",
           distance: "25 km away",
-          price_diff: 120
+          price_diff: Math.round(currentPrice * 0.06) || 120
         },
         {
           market_name: "Madhavaram Local Mandi",
           distance: "40 km away",
-          price_diff: -40
+          price_diff: Math.round(currentPrice * 0.03) || 60
         }
       ]
     };

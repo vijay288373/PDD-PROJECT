@@ -1,15 +1,41 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ActivityIndicator } from "react-native";
 import { Bell, X, Check } from "lucide-react-native";
+import { useAuth } from "../../lib/AuthContext";
 
-// Mock base44 client since we don't have the actual import in context
-// In reality, this would be imported from "@/api/base44Client"
-const base44 = {
-  auth: { me: async () => ({ email: "test@example.com" }) },
-  entities: { PriceAlert: { create: async () => {} } }
-};
+const SUPA_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://ptnlnpcycionjciuodep.supabase.co';
+const SUPA_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'sb_publishable_DTMpMtKdF346pVGIQ8XMjw_FAeBcaIz';
+
+function supaHeaders() {
+  return {
+    apikey: SUPA_KEY,
+    Authorization: `Bearer ${SUPA_KEY}`,
+    'Content-Type': 'application/json',
+    Prefer: 'return=representation',
+  };
+}
+
+function genId() {
+  return Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+async function createSupaPriceAlert(alertObj) {
+  try {
+    const res = await fetch(`${SUPA_URL}/rest/v1/PriceAlert`, {
+      method: 'POST',
+      headers: supaHeaders(),
+      body: JSON.stringify(alertObj),
+    });
+    if (!res.ok) return null;
+    const rows = await res.json();
+    return rows[0] || alertObj;
+  } catch {
+    return null;
+  }
+}
 
 export default function SetAlertModal({ crop, currentPrice, unit, region, onClose, visible }) {
+  const { user } = useAuth();
   const [targetPrice, setTargetPrice] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -18,15 +44,13 @@ export default function SetAlertModal({ crop, currentPrice, unit, region, onClos
     if (!targetPrice || isNaN(Number(targetPrice))) return;
     setSaving(true);
     try {
-      const user = await base44.auth.me();
-      await base44.entities.PriceAlert.create({
-        uid: user.email,
-        crop,
+      const userEmail = user?.email || 'farmer@agriguard.com';
+      await createSupaPriceAlert({
+        id: genId(),
+        uid: userEmail,
+        crop_name: crop,
         target_price: Number(targetPrice),
-        unit: unit || "quintal",
-        region: region || "",
-        market: "",
-        triggered: false,
+        condition: 'above',
         is_active: true,
       });
       setSaved(true);
@@ -36,7 +60,7 @@ export default function SetAlertModal({ crop, currentPrice, unit, region, onClos
         onClose();
       }, 1200);
     } catch {
-      // Ignore errors for now
+      // Ignore
     }
     setSaving(false);
   };

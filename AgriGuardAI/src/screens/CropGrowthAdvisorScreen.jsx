@@ -733,7 +733,7 @@ export default function CropGrowthAdvisorScreen() {
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <LinearGradient colors={['#1e1b4b', '#312e81', '#3730a3']} style={styles.header}>
+        <LinearGradient colors={['#052e16', '#14532d', '#166534']} style={styles.header}>
           <Text style={styles.headerTitle}>🌱 Crop Growth Advisor</Text>
           <Text style={styles.headerSubtitle}>Stage-wise fertilizer, pesticide & nutrition guide</Text>
         </LinearGradient>
@@ -895,18 +895,18 @@ export default function CropGrowthAdvisorScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#f5f3ff' },
+  safeArea: { flex: 1, backgroundColor: '#f0fdf4' },
   container: { flex: 1 },
   header: { paddingTop: 48, paddingBottom: 20, paddingHorizontal: 16 },
   headerTitle: { color: '#fff', fontSize: 22, fontWeight: 'bold' },
-  headerSubtitle: { color: '#c7d2fe', fontSize: 13, marginTop: 4 },
+  headerSubtitle: { color: '#bbf7d0', fontSize: 13, marginTop: 4 },
   setupPanel: { backgroundColor: '#fff', margin: 12, borderRadius: 16, padding: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 6, elevation: 3 },
   setupLabel: { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 6 },
   cropPickerBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderColor: '#d1d5db', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12 },
   cropPickerText: { fontSize: 15, color: '#1f2937', fontWeight: '500' },
   stageScroll: { marginBottom: 12 },
   stageChip: { backgroundColor: '#f3f4f6', borderRadius: 12, padding: 10, marginRight: 8, alignItems: 'center', minWidth: 110, borderWidth: 1.5, borderColor: 'transparent' },
-  stageChipSelected: { backgroundColor: '#1e1b4b', borderColor: '#6366f1' },
+  stageChipSelected: { backgroundColor: '#052e16', borderColor: '#22c55e' },
   stageEmoji: { fontSize: 20, marginBottom: 2 },
   stageChipText: { fontSize: 12, fontWeight: '600', color: '#374151', textAlign: 'center' },
   stageChipTextSelected: { color: '#fff' },
@@ -914,17 +914,17 @@ const styles = StyleSheet.create({
   inputsRow: { flexDirection: 'row', gap: 10, marginTop: 4 },
   inputItem: { flex: 1 },
   inputBox: { borderWidth: 1, borderColor: '#d1d5db', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15, color: '#1f2937', fontWeight: '600' },
-  fetchBtn: { backgroundColor: '#4f46e5', borderRadius: 12, paddingVertical: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 12 },
-  fetchBtnDisabled: { backgroundColor: '#c7d2fe' },
+  fetchBtn: { backgroundColor: '#166534', borderRadius: 12, paddingVertical: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 12 },
+  fetchBtnDisabled: { backgroundColor: '#bbf7d0' },
   fetchBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
   resultsSection: { paddingHorizontal: 12 },
-  resultsHeader: { fontSize: 18, fontWeight: '800', color: '#1e1b4b', paddingTop: 16, paddingBottom: 2 },
+  resultsHeader: { fontSize: 18, fontWeight: '800', color: '#052e16', paddingTop: 16, paddingBottom: 2 },
   resultsSubHeader: { fontSize: 12, color: '#6b7280', marginBottom: 12 },
   tabRow: { flexDirection: 'row', backgroundColor: '#f3f4f6', borderRadius: 12, padding: 4, marginBottom: 12 },
   tab: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 10 },
   tabActive: { backgroundColor: '#fff', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 },
   tabText: { fontSize: 12, color: '#9ca3af', fontWeight: '500' },
-  tabTextActive: { color: '#1e1b4b', fontWeight: '700' },
+  tabTextActive: { color: '#052e16', fontWeight: '700' },
   advisoryCard: { backgroundColor: '#fff', borderRadius: 14, padding: 14, marginBottom: 10, borderLeftWidth: 4, borderLeftColor: '#16a34a', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 1 },
   pesticideCard: { borderLeftColor: '#dc2626' },
   nutrientCard: { borderLeftColor: '#2563eb' },

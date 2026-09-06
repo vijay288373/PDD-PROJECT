@@ -12,11 +12,11 @@ const DEPRECATED_LOCAL_LABELS = {
   lbl_email: { en: "Email Address", hi: "à¤ˆà¤®à¥‡à¤² à¤ªà¤¤à¤¾", ta: "à®®à®¿à®©à¯à®©à®žà¯à®šà®²à¯ à®®à¯à®•à®µà®°à®¿", te: "à°ˆà°®à±†à°¯à°¿à°²à± à°šà°¿à°°à±à°¨à°¾à°®à°¾", es: "DirecciÃ³n de correo electrÃ³nico" },
   lbl_password: { en: "Password", hi: "à¤ªà¤¾à¤¸à¤µà¤°à¥à¤¡", ta: "à®•à®Ÿà®µà¯à®šà¯à®šà¯Šà®²à¯", te: "à°ªà°¾à°¸à±â€Œà°µà°°à±à°¡à±", es: "ContraseÃ±a" },
   
-  welcome_back: { en: "Welcome Back! ðŸŒ¾", hi: "à¤†à¤ªà¤•à¤¾ à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤¹à¥ˆ! ðŸŒ¾", ta: "à®®à¯€à®£à¯à®Ÿà¯à®®à¯ à®µà®°à¯à®•! ðŸŒ¾", te: "à°¸à±à°µà°¾à°—à°¤à°‚! ðŸŒ¾", es: "Â¡Bienvenido de nuevo! ðŸŒ¾" },
+  welcome_back: { en: "Welcome Back! 🌾", hi: "à¤†à¤ªà¤•à¤¾ à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤¹à¥ˆ! 🌾", ta: "à®®à¯€à®£à¯à®Ÿà¯à®®à¯ à®µà®°à¯à®•! 🌾", te: "à°¸à±à°µà°¾à°—à°¤à°‚! 🌾", es: "Â¡Bienvenido de nuevo! 🌾" },
   logged_in_success: { en: "Logged in successfully as Demo Farmer.", hi: "à¤¡à¥‡à¤®à¥‹ à¤•à¤¿à¤¸à¤¾à¤¨ à¤•à¥‡ à¤°à¥‚à¤ª à¤®à¥‡à¤‚ à¤¸à¤«à¤²à¤¤à¤¾à¤ªà¥‚à¤°à¥à¤µà¤• à¤²à¥‰à¤— à¤‡à¤¨ à¤•à¤¿à¤¯à¤¾ à¤—à¤¯à¤¾à¥¤", ta: "à®Ÿà¯†à®®à¯‹ à®µà®¿à®µà®šà®¾à®¯à®¿à®¯à®¾à®• à®µà¯†à®±à¯à®±à®¿à®•à®°à®®à®¾à®• à®‰à®³à¯à®¨à¯à®´à¯ˆà®¨à¯à®¤à¯à®³à¯à®³à¯€à®°à¯à®•à®³à¯.", te: "à°¡à±†à°®à±‹ à°°à±ˆà°¤à±à°—à°¾ à°µà°¿à°œà°¯à°µà°‚à°¤à°‚à°—à°¾ à°²à°¾à°—à°¿à°¨à± à°…à°¯à±à°¯à°¾à°°à±.", es: "SesiÃ³n iniciada con Ã©xito como agricultor de demostraciÃ³n." },
-  account_created: { en: "Account Created! ðŸŽ‰", hi: "à¤–à¤¾à¤¤à¤¾ à¤¸à¤«à¤²à¤¤à¤¾à¤ªà¥‚à¤°à¥à¤µà¤• à¤¬à¤¨ à¤—à¤¯à¤¾! ðŸŽ‰", ta: "à®•à®£à®•à¯à®•à¯ à®‰à®°à¯à®µà®¾à®•à¯à®•à®ªà¯à®ªà®Ÿà¯à®Ÿà®¤à¯! ðŸŽ‰", te: "à°–à°¾à°¤à°¾ à°¸à±ƒà°·à±à°Ÿà°¿à°‚à°šà°¬à°¡à°¿à°‚à°¦à°¿! ðŸŽ‰", es: "Â¡Cuenta creada! ðŸŽ‰" },
+  account_created: { en: "Account Created! 🎉", hi: "à¤–à¤¾à¤¤à¤¾ à¤¸à¤«à¤²à¤¤à¤¾à¤ªà¥‚à¤°à¥à¤µà¤• à¤¬à¤¨ à¤—à¤¯à¤¾! 🎉", ta: "à®•à®£à®•à¯à®•à¯ à®‰à®°à¯à®µà®¾à®•à¯à®•à®ªà¯à®ªà®Ÿà¯à®Ÿà®¤à¯! 🎉", te: "à°–à°¾à°¤à°¾ à°¸à±ƒà°·à±à°Ÿà°¿à°‚à°šà°¬à°¡à°¿à°‚à°¦à°¿! 🎉", es: "Â¡Cuenta creada! 🎉" },
   welcome_user: { en: "Welcome to Agri Guard AI", hi: "à¤à¤—à¥à¤°à¥€ à¤—à¤¾à¤°à¥à¤¡ à¤à¤†à¤ˆ à¤®à¥‡à¤‚ à¤†à¤ªà¤•à¤¾ à¤¸à¥à¤µà¤¾à¤—à¤¤ à¤¹à¥ˆ", ta: "Agri Guard AI à®•à¯à®•à¯ à®‰à®™à¯à®•à®³à¯ˆ à®µà®°à®µà¯‡à®±à¯à®•à®¿à®±à¯‹à®®à¯", te: "Agri Guard AI à°•à°¿ à°¸à±à°µà°¾à°—à°¤à°‚", es: "Bienvenido a Agri Guard IA" },
-  demo_active: { en: "Demo Account Active! ðŸ‘¨â€ðŸŒ¾", hi: "à¤¡à¥‡à¤®à¥‹ à¤–à¤¾à¤¤à¤¾ à¤¸à¤•à¥à¤°à¤¿à¤¯! ðŸ‘¨â€ðŸŒ¾", ta: "à®Ÿà¯†à®®à¯‹ à®•à®£à®•à¯à®•à¯ à®šà¯†à®¯à®²à¯à®ªà®Ÿà¯à®•à®¿à®±à®¤à¯! ðŸ‘¨â€ðŸŒ¾", te: "à°¡à±†à°®à±‹ à°–à°¾à°¤à°¾ à°¸à°•à±à°°à°¿à°¯à°‚à°—à°¾ à°‰à°‚à°¦à°¿! ðŸ‘¨â€ðŸŒ¾", es: "Â¡Cuenta de demostraciÃ³n activa! ðŸ‘¨â€ðŸŒ¾" },
+  demo_active: { en: "Demo Account Active! ðŸ‘¨â€🌾", hi: "à¤¡à¥‡à¤®à¥‹ à¤–à¤¾à¤¤à¤¾ à¤¸à¤•à¥à¤°à¤¿à¤¯! ðŸ‘¨â€🌾", ta: "à®Ÿà¯†à®®à¯‹ à®•à®£à®•à¯à®•à¯ à®šà¯†à®¯à®²à¯à®ªà®Ÿà¯à®•à®¿à®±à®¤à¯! ðŸ‘¨â€🌾", te: "à°¡à±†à°®à±‹ à°–à°¾à°¤à°¾ à°¸à°•à±à°°à°¿à°¯à°‚à°—à°¾ à°‰à°‚à°¦à°¿! ðŸ‘¨â€🌾", es: "Â¡Cuenta de demostraciÃ³n activa! ðŸ‘¨â€🌾" },
   demo_active_desc: { en: "Entered as Demo Farmer. Happy farming!", hi: "à¤¡à¥‡à¤®à¥‹ à¤•à¤¿à¤¸à¤¾à¤¨ à¤•à¥‡ à¤°à¥‚à¤ª à¤®à¥‡à¤‚ à¤ªà¥à¤°à¤µà¥‡à¤¶ à¤•à¤¿à¤¯à¤¾à¥¤ à¤¶à¥à¤­ à¤•à¥ƒà¤·à¤¿!", ta: "à®Ÿà¯†à®®à¯‹ à®µà®¿à®µà®šà®¾à®¯à®¿à®¯à®¾à®• à®¨à¯à®´à¯ˆà®¨à¯à®¤à¯à®³à¯à®³à¯€à®°à¯à®•à®³à¯. à®µà®¾à®´à¯à®¤à¯à®¤à¯à®•à®³à¯!", te: "à°¡à±†à°®à±‹ à°°à±ˆà°¤à±à°—à°¾ à°ªà±à°°à°µà±‡à°¶à°¿à°‚à°šà°¾à°°à±. à°¹à±à°¯à°¾à°ªà±€ à°«à°¾à°°à±à°®à°¿à°‚à°—à±!", es: "Ingresado como Agricultor de DemostraciÃ³n. Â¡Feliz cultivo!" }
 };
 
@@ -159,19 +159,32 @@ export default function LoginPage() {
 
   return (
     <div className="relative min-h-screen flex overflow-hidden bg-slate-950 font-sans">
-      {/* Background orbs */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-950 via-slate-950 to-teal-950" />
-      <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[150px] pointer-events-none animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/3 w-[400px] h-[400px] bg-teal-500/10 rounded-full blur-[120px] pointer-events-none animate-pulse" />
-
-      {/* Floating Particles */}
+      {/* Premium Animated Background */}
+      <motion.div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat origin-center"
+        style={{ backgroundImage: 'url("/images/agri_login_bg.jpg")' }}
+        animate={{ scale: [1, 1.05, 1] }}
+        transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+      />
+      
+      {/* Dynamic Animated Mesh Overlays */}
+      <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-900/40 via-slate-950/80 to-slate-950" />
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-emerald-950/50 to-slate-950/90" />
+      
+      {/* Floating Particles (Glowing Fireflies) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {dots.map((dot) => (
           <motion.div
             key={dot.id}
-            className="absolute rounded-full bg-emerald-400/20 blur-[1px]"
+            className="absolute rounded-full bg-emerald-400 shadow-[0_0_15px_3px_rgba(52,211,153,0.6)]"
             style={{ width: dot.size, height: dot.size, left: `${dot.x}%`, top: `${dot.y}%` }}
-            animate={{ y: [0, -100, 0], opacity: [0.1, 0.5, 0.1] }}
+            animate={{ 
+              y: [0, -200, 0], 
+              x: [0, Math.random() * 50 - 25, 0],
+              opacity: [0, 0.9, 0], 
+              scale: [0.8, 1.5, 0.8] 
+            }}
             transition={{ duration: dot.duration, repeat: Infinity, delay: dot.delay, ease: 'easeInOut' }}
           />
         ))}
@@ -195,22 +208,22 @@ export default function LoginPage() {
             animate={{ y: [0, -8, 0] }}
             transition={{ repeat: Infinity, duration: 5, ease: 'easeInOut' }}
             className="text-6xl mb-6"
-          >ðŸŒ¾</motion.div>
+          >🌾</motion.div>
           <h2 className="text-4xl font-extrabold text-white leading-tight mb-4">
             Your Smart<br />
             <span className="bg-gradient-to-r from-emerald-400 to-green-300 bg-clip-text text-transparent">
               Farming Mentor
             </span>
           </h2>
-          <p className="text-slate-400 text-base leading-relaxed mb-8">
-            AI-powered crop advisory, real-time mandi prices, and precision weather alerts â€” designed for India's small farmers (0â€“10 acres).
+          <p className="text-slate-300 text-base leading-relaxed mb-8 drop-shadow-md">
+            AI-powered crop advisory, real-time mandi prices, and precision weather alerts — designed for India's small farmers (0-10 acres).
           </p>
           <div className="space-y-4">
             {[
-              { icon: 'ðŸŒ¿', title: 'Smart Crop Advisor', desc: 'Get zone-based crop recommendations with ICAR data' },
-              { icon: 'ðŸ“Š', title: 'Live APMC Prices', desc: 'Real-time mandi prices from your nearest markets' },
-              { icon: 'ðŸŒ¦ï¸', title: 'Weather Intelligence', desc: '7-day forecast with crop-specific impact alerts' },
-              { icon: 'ðŸ”¬', title: 'AI Plant Scan', desc: 'Diagnose diseases from a simple photo of your crop' },
+              { icon: '🌱', title: 'Smart Crop Advisor', desc: 'Get zone-based crop recommendations with ICAR data' },
+              { icon: '📊', title: 'Live APMC Prices', desc: 'Real-time mandi prices from your nearest markets' },
+              { icon: '🌤️', title: 'Weather Intelligence', desc: '7-day forecast with crop-specific impact alerts' },
+              { icon: '🔬', title: 'AI Plant Scan', desc: 'Diagnose diseases from a simple photo of your crop' },
             ].map((f, i) => (
               <motion.div
                 key={i}
@@ -229,17 +242,20 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="text-slate-600 text-xs">Â© 2025 AgriGuard AI Â· Built for Bharat's Farmers</p>
+        <p className="text-slate-400/80 text-xs tracking-wide">© 2025 AgriGuard AI · Built for Bharat's Farmers</p>
       </div>
 
-      {/* â”€â”€ RIGHT PANEL â€” Login Form â”€â”€ */}
+      {/* ── RIGHT PANEL — Login Form ── */}
       <div className="relative z-10 w-full md:w-1/2 flex items-center justify-center px-6 py-12">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="w-full max-w-md bg-white/8 backdrop-blur-2xl border border-white/15 shadow-[0_20px_60px_rgba(16,185,129,0.15)] rounded-3xl p-8"
+          initial={{ opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="relative w-full max-w-md bg-slate-950/60 backdrop-blur-3xl border border-emerald-500/20 shadow-[0_0_80px_-20px_rgba(16,185,129,0.4),inset_0_1px_1px_rgba(255,255,255,0.1)] rounded-[2.5rem] p-8 lg:p-10 overflow-hidden"
         >
+          {/* Edge Lighting Effect */}
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent" />
+          
           {/* Brand Header (visible on mobile only) */}
           <div className="flex flex-col items-center mb-6 text-center md:hidden">
             <div className="w-14 h-14 bg-gradient-to-tr from-emerald-500 to-green-400 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-3">
@@ -254,13 +270,13 @@ export default function LoginPage() {
           </div>
 
           {/* Desktop header */}
-          <div className="hidden md:block mb-6">
-            <h2 className="text-2xl font-extrabold text-white">Welcome back ðŸ‘‹</h2>
-            <p className="text-slate-400 text-sm mt-1">Sign in to your farm dashboard</p>
+          <div className="hidden md:block mb-8">
+            <h2 className="text-3xl font-bold text-white mb-2">{t("welcome_back", langCode)}</h2>
+            <p className="text-slate-300/80 text-sm font-medium">Sign in to your intelligent farm dashboard</p>
           </div>
 
           {/* Tab Switcher */}
-          <div className="relative flex bg-slate-900/60 p-1 rounded-xl border border-white/5 mb-6">
+          <div className="relative flex bg-slate-950/40 p-1.5 rounded-2xl border border-white/5 mb-8 shadow-inner">
             <button
               onClick={() => { setIsSignIn(true); setErrorMsg(''); }}
               disabled={isTypingDemo || isLoading}
@@ -425,10 +441,10 @@ export default function LoginPage() {
           </Button>
 
           {/* Footer tags */}
-          <div className="mt-5 flex justify-center gap-4 text-xxs text-slate-500 border-t border-white/5 pt-4">
-            <span className="flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500/60" /> {t("live_ai_diagnose", langCode)}</span>
-            <span className="flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500/60" /> {t("mandi_tracking", langCode)}</span>
-            <span className="flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500/60" /> {t("weather_alerts_label", langCode)}</span>
+          <div className="mt-8 flex justify-center gap-5 text-xxs text-emerald-400/70 pt-5">
+            <span className="flex items-center gap-1.5 font-medium"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> {t("live_ai_diagnose", langCode)}</span>
+            <span className="flex items-center gap-1.5 font-medium"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> {t("mandi_tracking", langCode)}</span>
+            <span className="flex items-center gap-1.5 font-medium"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> {t("weather_alerts_label", langCode)}</span>
           </div>
         </motion.div>
       </div>

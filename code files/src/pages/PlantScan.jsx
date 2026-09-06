@@ -249,9 +249,9 @@ Schema:
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f8f0]">
+    <div className="min-h-screen bg-[#f0fdf4]">
       {/* Header */}
-      <div className="bg-[#1a5c2a] px-4 pt-safe-top pb-4 shadow-lg">
+      <div className="bg-gradient-to-r from-[#052e16] to-[#166534] px-4 pt-safe-top pb-4 shadow-lg">
         <div className="w-full flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-[#4ade80] rounded-full flex items-center justify-center">

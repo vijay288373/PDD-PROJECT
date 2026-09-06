@@ -15,70 +15,123 @@ import AIPriceForecast from "@/components/market/AIPriceForecast";
 import SetAlertModal from "@/components/market/SetAlertModal";
 import { format } from "date-fns";
 import { getPrecisionLocation, getGeocodedLocation } from "@/lib/location";
+import { fetchLiveAPMCPrices } from "@/api/apmcClient";
 
-const CROP_KEYS = {
-  "Rice": "crop_rice",
-  "Wheat": "crop_wheat",
-  "Tomato": "crop_tomato",
-  "Potato": "crop_potato",
-  "Onion": "crop_onion",
-  "Maize / Corn": "crop_maize",
-  "Cotton": "crop_cotton",
-  "Sugarcane": "crop_sugarcane",
-  "Pepper (Bell/Chili)": "crop_chili",
-  "Banana / Plantain": "crop_banana"
-};
+const ALL_CROPS = [
+  "Rice", "Tomato", "Potato", "Wheat", "Onion", 
+  "Cotton", "Maize / Corn", "Sugarcane", 
+  "Turmeric", "Pepper (Bell/Chili)", "Banana / Plantain", 
+  "Coconut", "Groundnut / Peanut", "Soybean", "Chickpea", "Apple", "Millet"
+];
 
-const DEPRECATED_LOCAL_LABELS = {
-  prices_near: { en: "Prices near", hi: "मंडी भाव यहाँ के:", ta: "விலைகள் அருகில்", te: "ధరలు దగ్గరగా", es: "Precios cerca de" },
-  btn_change: { en: "Change", hi: "बदलें", ta: "மாற்று", te: "మార్చండి", es: "Cambiar" },
-  updated_at: { en: "Updated at", hi: "अद्यतित किया गया", ta: "புதுப்பிக்கப்பட்டது", te: "నవీకరించబడింది", es: "Actualizado a las" },
-  refresh: { en: "Refresh", hi: "ताज़ा करें", ta: "புதுப்பி", te: "రిఫ్రెష్", es: "Actualizar" },
-  live_prices: { en: "Live Prices", hi: "लाइव मंडी भाव", ta: "நேரடி விலைகள்", te: "లైవ్ ధరలు", es: "Precios en vivo" },
-  tap_forecast_hint: { en: "Tap a crop card to view AI price forecast →", hi: "मूल्य पूर्वानुमान देखने के लिए कार्ड पर टैप करें →", ta: "முன்னறிவிப்பைக் காண பயிர் கார்டைத் தட்டவும் →", te: "ధర అంచనాను చూడటానికి కార్డ్‌ను నొక్కండి →", es: "Toque una tarjeta para ver el pronóstico →" },
-  no_crop_selected: { en: "No crop selected", hi: "कोई फसल नहीं चुनी गई", ta: "பயிர் எதுவும் தேர்ந்தெடுக்கப்படவில்லை", te: "ఏ పంట ఎంచుకోలేదు", es: "Ningún cultivo seleccionado" },
-  no_crop_selected_desc: { en: "Go to Live Prices and tap a crop to analyze", hi: "लाइव मंडी भाव में जाएं और विश्लेषण के लिए एक फसल पर टैप करें", ta: "நேரடி விலைகளுக்குச் சென்று பகுப்பாய்வு செய்ய பயிரைத் தட்டவும்", te: "లైవ్ ధరలకు వెళ్లి విశ్లేషించడానికి ఒక పంటపై నొక్కండి", es: "Vaya a Precios en vivo y toque un cultivo para analizar" },
-  ai_intelligence: { en: "AI Market Intelligence", hi: "एआई बाजार विश्लेषण", ta: "AI சந்தை நுண்ணறிவு", te: "AI మార్కెట్ ఇంటెలిజెన్స్", es: "Inteligencia de mercado de IA" },
-  change_prompt: { en: "Enter market or city name:", hi: "मंडी या शहर का नाम दर्ज करें:", ta: "சந்தை அல்லது நகரத்தின் பெயரை உள்ளிடவும்:", te: "మండి లేదా నగరం పేరును నమోదు చేయండి:", es: "Ingrese el nombre del mercado o ciudad:" }
-};
+const SUPA_URL = import.meta.env.VITE_SUPABASE_URL || 'https://ptnlnpcycionjciuodep.supabase.co';
+const SUPA_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_DTMpMtKdF346pVGIQ8XMjw_FAeBcaIz';
+
+function supaHeaders() {
+  return {
+    apikey: SUPA_KEY,
+    Authorization: `Bearer ${SUPA_KEY}`,
+    'Content-Type': 'application/json',
+  };
+}
+
+async function getUserMyCrops(userEmail) {
+  let crops = [];
+
+  const extractNames = (arr) => {
+    if (!Array.isArray(arr)) return [];
+    return arr.map(c => {
+      if (typeof c === 'string') return c;
+      if (c && typeof c === 'object') return c.name || c.id || c.crop || c.cropName || '';
+      return '';
+    }).filter(Boolean);
+  };
+
+  try {
+    const profStr = localStorage.getItem('agriguard_farmer_profile');
+    if (profStr) {
+      const prof = JSON.parse(profStr);
+      const extracted = extractNames(prof.primary_crops || prof.myCrops || prof.crops);
+      if (extracted.length > 0) crops = extracted;
+    }
+  } catch {}
+
+  if (!crops || crops.length === 0) {
+    try {
+      if (userEmail) {
+        const res = await fetch(`${SUPA_URL}/rest/v1/FarmerProfile?uid=eq.${encodeURIComponent(userEmail)}&order=created_date.asc&limit=1`, { headers: supaHeaders() });
+        if (res.ok) {
+          const rows = await res.json();
+          if (rows[0]) {
+            const extracted = extractNames(rows[0].primary_crops || rows[0].myCrops || rows[0].crops);
+            if (extracted.length > 0) crops = extracted;
+          }
+        }
+      }
+    } catch {}
+  }
+
+  if (!crops || crops.length === 0) {
+    try {
+      const local = localStorage.getItem('agriguard_my_crops');
+      if (local) {
+        const arr = JSON.parse(local);
+        const extracted = extractNames(arr);
+        if (extracted.length > 0) crops = extracted;
+      }
+    } catch {}
+  }
+
+  if (!crops || crops.length === 0) {
+    crops = ["Rice", "Tomato", "Potato"];
+  }
+
+  return crops;
+}
 
 export default function MarketPrices() {
   const [userProfile, setUserProfile] = useState(null);
-  const [crops, setCrops] = useState([]);
+  const [userCrops, setUserCrops] = useState(["Rice", "Tomato", "Potato"]);
+  const [showAllCrops, setShowAllCrops] = useState(false);
   const [priceData, setPriceData] = useState({});
-  const [trendData, setTrendData] = useState(null);
-  const [aiForecast, setAiForecast] = useState(null);
-  const [selectedCrop, setSelectedCrop] = useState(null);
+  const [mandiName, setMandiName] = useState("Koyambedu APMC Mandi");
+  const [selectedCrop, setSelectedCrop] = useState("Rice");
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
-  const [trendLoading, setTrendLoading] = useState(false);
-  const [forecastLoading, setForecastLoading] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState(null);
-  const [alertModal, setAlertModal] = useState(null); // { crop, priceData }
-  const [activeTab, setActiveTab] = useState("prices"); // prices | forecast
-  const [priceError, setPriceError] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [alertModal, setAlertModal] = useState(null);
+  const [activeTab, setActiveTab] = useState("prices");
   const { langCode } = useLang();
 
-  // Load user profile + determine crops to show + fetch location
+  const loadMarketData = useCallback(async (regionVal, cropsList) => {
+    setLoading(true);
+    try {
+      const apmcResult = await fetchLiveAPMCPrices(regionVal, cropsList);
+      if (apmcResult && apmcResult.prices) {
+        setPriceData(apmcResult.prices);
+        if (apmcResult.mandi_name) setMandiName(apmcResult.mandi_name);
+        setLastUpdated(apmcResult.last_updated || new Date());
+      }
+    } catch (e) {
+      console.log("Error loading APMC market prices:", e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     const init = async () => {
-      let cropList = ["Rice", "Wheat", "Tomato", "Onion", "Potato"];
-      let regionVal = "India";
-      let profileObj = null;
-
+      let regionVal = "Chennai, Tamil Nadu, India";
+      let userEmail = null;
       try {
         const user = await base44.auth.me();
-        const profiles = await base44.entities.FarmerProfile.filter({ uid: user.email });
-        if (profiles.length > 0) {
-          profileObj = profiles[0];
-          cropList = profiles[0].primary_crops?.length ? profiles[0].primary_crops : cropList;
-          regionVal = profiles[0].region || profiles[0].country || regionVal;
-        }
-      } catch (err) {
-        console.warn("Failed to fetch profile in market prices:", err);
-      }
+        userEmail = user?.email;
+      } catch {}
 
-      // Overwrite with precision current location if available!
+      const cropsList = await getUserMyCrops(userEmail);
+      setUserCrops(cropsList);
+      if (cropsList.length > 0) setSelectedCrop(cropsList[0]);
+
       try {
         const coords = await getPrecisionLocation();
         if (coords) {
@@ -87,396 +140,162 @@ export default function MarketPrices() {
             regionVal = geo.formatted;
           }
         }
-      } catch (err) {
-        console.warn("Failed to get precision location, falling back:", err);
-      }
+      } catch {}
 
-      setUserProfile({ ...profileObj, region: regionVal });
-      setCrops(cropList);
+      setUserProfile({ region: regionVal });
+      loadMarketData(regionVal, cropsList);
     };
     init();
-  }, []);
+  }, [loadMarketData]);
 
-  // Try APMC data.gov.in live prices
-  const fetchAPMCPrices = useCallback(async (region, cropList) => {
-    try {
-      const stateName = region?.split(',').find(s => s.trim().length > 3)?.trim() || 'Tamil Nadu';
-      const url = `https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070?api-key=579b464db66ec23bdd000001cdd3946e44ce4aad38534209a06fe33&format=json&limit=50&filters[State]=${encodeURIComponent(stateName)}`;
-      const resp = await fetch(url);
-      if (resp.ok) {
-        const data = await resp.json();
-        if (data?.records?.length > 0) {
-          const newPrices = {};
-          data.records.forEach(rec => {
-            const commodity = rec.Commodity || rec.commodity || '';
-            const modal = parseFloat(rec.Modal_Price || rec.modal_price || 0);
-            const min = parseFloat(rec.Min_Price || rec.min_price || 0);
-            const max = parseFloat(rec.Max_Price || rec.max_price || 0);
-            if (commodity && modal > 0) {
-              const matched = cropList.find(c =>
-                c.toLowerCase().includes(commodity.toLowerCase().slice(0, 4)) ||
-                commodity.toLowerCase().includes(c.toLowerCase().slice(0, 4))
-              );
-              if (matched && !newPrices[matched]) {
-                const base = newPrices[matched]?.modal_price || modal;
-                newPrices[matched] = {
-                  modal_price: modal, min_price: min, max_price: max,
-                  change_pct: parseFloat(((modal - base) / base * 100).toFixed(1)),
-                  unit: 'quintal', estimated: false,
-                  mandi: rec.Market || rec.market || stateName
-                };
-              }
-            }
-          });
-          if (Object.keys(newPrices).length > 0) {
-            setPriceData(prev => ({ ...prev, ...newPrices }));
-            setLastUpdated(new Date());
-            return true;
-          }
-        }
-      }
-    } catch (e) {
-      console.log('APMC API unavailable, using AI prices:', e.message);
-    }
-    return false;
-  }, []);
-
-  const fetchPrices = useCallback(async (cropList, region) => {
-    if (!cropList.length) return;
-    setLoading(true);
-    setPriceError(false);
-
-    // Try live APMC data first
-    const apmc_ok = await fetchAPMCPrices(region, cropList);
-    if (apmc_ok) { setLoading(false); return; }
-
-    // Fallback: AI-generated mandi prices
-    try {
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are an agricultural market data service for India. Provide highly realistic, up-to-date simulated market prices (modal, min, max in INR per quintal) reflecting current trends.
-Region: ${region || "India"}
-Crops: ${cropList.join(", ")}
-Today's date: ${new Date().toDateString()}
-
-Provide realistic wholesale mandi (market) prices for each crop. 
-Base prices on actual Indian mandi data and current seasonal trends.
-Use Agmarknet-style data for Indian markets.
-
-Return ONLY this JSON:
-{
-  "market_name": "<nearest major mandi>",
-  "prices": {
-    "<crop_name>": {
-      "modal_price": <number in INR per quintal>,
-      "min_price": <number>,
-      "max_price": <number>,
-      "change_pct": <number, positive=up, negative=down>,
-      "unit": "quintal",
-      "estimated": true
-    }
-  }
-}
-
-Be realistic. Rice ~1800-2200, Wheat ~2000-2500, Tomato ~800-3000 (volatile), Onion ~1000-2500, Potato ~800-1500, Cotton ~6000-7500.`,
-        add_context_from_internet: true,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            market_name: { type: "string" },
-            prices: { type: "object" }
-          }
-        }
-      });
-      setPriceData(result.prices || {});
-      setLastUpdated(new Date());
-      if (result.market_name && !userProfile?.region) {
-        setUserProfile(p => ({ ...p, _market: result.market_name }));
-      }
-    } catch { setPriceError(true); }
-    setLoading(false);
-  }, [fetchAPMCPrices]);
-
-  useEffect(() => {
-    if (crops.length) {
-      const region = userProfile?.region || userProfile?.country || "India";
-      fetchPrices(crops, region);
-    }
-  }, [crops, userProfile?.region]);
-
-  const handleSelectCrop = async (crop) => {
+  const handleSelectCrop = (crop) => {
     setSelectedCrop(crop);
     setActiveTab("forecast");
-    setTrendLoading(true);
-    setForecastLoading(true);
-    setTrendData(null);
-    setAiForecast(null);
-
-    const region = userProfile?.region || userProfile?.country || "India";
-    const language = userProfile?.language || "English";
-    const currentPrice = priceData[crop]?.modal_price;
-    const month = format(new Date(), "MMMM yyyy");
-
-    try {
-      // Fetch trend data + AI forecast in parallel
-      const [trendResult, forecastResult] = await Promise.all([
-        base44.integrations.Core.InvokeLLM({
-          prompt: `Generate realistic 90-day historical price data and 7-day forecast for ${crop} in ${region}.
-Today: ${new Date().toDateString()}. Current modal price: ₹${currentPrice || "unknown"}/quintal.
-
-Return ONLY this JSON:
-{
-  "historical": [
-    { "date": "<e.g. May 1>", "price": <number> }
-  ],
-  "forecast": [
-    { "date": "<e.g. Jun 14>", "price": <number> }
-  ]
-}
-historical must have exactly 90 entries, forecast exactly 7. Prices should show realistic seasonal movement.`,
-          response_json_schema: {
-            type: "object",
-            properties: {
-              historical: { type: "array", items: { type: "object" } },
-              forecast: { type: "array", items: { type: "object" } }
-            }
-          }
-        }),
-        base44.integrations.Core.InvokeLLM({
-          prompt: `You are an agricultural commodity analyst.
-Crop: ${crop}
-Region: ${region}
-Current price: ₹${currentPrice || "unknown"}/quintal
-Month: ${month}
-Language for output text: ${language}
-
-Provide market intelligence in this EXACT JSON format:
-{
-  "recommendation": "SELL" | "HOLD" | "WAIT",
-  "recommendation_reason": "<one sentence>",
-  "best_sell_window": {
-    "dates": "<e.g. Jun 14–17>",
-    "reason": "<short reason>"
-  },
-  "scenarios": {
-    "optimistic": <price number>,
-    "likely": <price number>,
-    "pessimistic": <price number>
-  },
-  "price_factors": ["<factor 1 as short label>", "<factor 2>", "<factor 3>"],
-  "nearby_markets": [
-    {
-      "market_name": "<market name>",
-      "distance": "<e.g. 45 km away>",
-      "price_diff": <positive number = higher price there>
-    },
-    {
-      "market_name": "<market name>",
-      "distance": "<e.g. 80 km away>",
-      "price_diff": <number>
-    }
-  ]
-}`,
-          response_json_schema: {
-            type: "object",
-            properties: {
-              recommendation: { type: "string" },
-              recommendation_reason: { type: "string" },
-              best_sell_window: { type: "object" },
-              scenarios: { type: "object" },
-              price_factors: { type: "array", items: { type: "string" } },
-              nearby_markets: { type: "array", items: { type: "object" } }
-            }
-          }
-        })
-      ]);
-
-      setTrendData(trendResult);
-      setAiForecast(forecastResult);
-    } catch {}
-
-    setTrendLoading(false);
-    setForecastLoading(false);
   };
 
-  const region = userProfile?.region || userProfile?.country || userProfile?._market || "India";
-  const filteredCrops = crops.filter(c => c.toLowerCase().includes(search.toLowerCase()));
-  const { refreshing, containerRef } = usePullToRefresh(() => fetchPrices(crops, region));
-
-  const pricesNearStr = t("prices_near", langCode);
-  const changeStr = t("btn_change", langCode);
-  const updatedAtStr = t("updated_at", langCode);
-  const refreshStr = t("refresh", langCode);
-  const livePricesStr = t("live_prices", langCode);
+  const activeCropsList = showAllCrops || search.trim().length > 0 ? ALL_CROPS : userCrops;
+  const filteredCrops = activeCropsList.filter(crop =>
+    crop.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <div className="min-h-screen bg-[#f5f8f0]">
+    <div className="min-h-screen bg-[#052e16] pb-24 text-white">
       {/* Header */}
-      <div className="bg-[#1a5c2a] px-4 pt-4 pb-4 shadow-lg">
-        <div className="w-full">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-[#4ade80]" />
-                <h1 className="text-white font-bold text-lg">{t("market_prices", langCode)}</h1>
-              </div>
-              <div className="flex items-center gap-1 mt-0.5">
-                <MapPin className="w-3 h-3 text-[#4ade80]" />
-                <p className="text-[#a7f3c8] text-xs">{pricesNearStr} {region}</p>
-                <button
-                  onClick={() => {
-                    const promptText = t("change_prompt", langCode);
-                    const m = prompt(promptText);
-                    if (m) setUserProfile(p => ({ ...p, region: m }));
-                  }}
-                  className="text-[#4ade80] text-xs ml-1 underline"
-                >
-                  {changeStr}
-                </button>
-              </div>
+      <div className="bg-[#052e16] p-4 pt-6 border-b border-green-800/40">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <div className="flex items-center gap-1.5 text-xs text-green-400 mb-1 font-semibold">
+              <MapPin className="w-3.5 h-3.5" />
+              <span>{userProfile?.region || "Chennai, Tamil Nadu, India"} • {mandiName}</span>
             </div>
-            <div className="text-right">
-              {lastUpdated && (
-                <p className="text-[#a7f3c8] text-xs">{updatedAtStr} {format(lastUpdated, "h:mm a")}</p>
-              )}
-              <button
-                onClick={() => fetchPrices(crops, region)}
-                className="mt-1 flex items-center gap-1 text-[#4ade80] text-xs"
-              >
-                <RefreshCw className="w-3 h-3" /> {refreshStr}
-              </button>
-            </div>
+            <h1 className="font-bold text-2xl text-white">Mandi Market Prices (APMC Agmarknet)</h1>
           </div>
+          <button
+            onClick={() => loadMarketData(userProfile?.region || "Tamil Nadu, India", activeCropsList)}
+            className="p-2 bg-green-900/60 rounded-xl border border-green-700/40 hover:bg-green-800/60"
+          >
+            <RefreshCw className={`w-4 h-4 text-green-400 ${loading ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
 
-          {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
-              placeholder={t("commodity_search", langCode)}
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="pl-9 bg-white border-0 rounded-xl h-9 text-sm"
-            />
-          </div>
+        {/* Search */}
+        <div className="relative mb-3">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Input
+            placeholder="Search crop mandi price..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-10 bg-white/10 border-green-800/50 text-white placeholder-gray-400 rounded-xl h-10 text-sm focus:border-green-400"
+          />
+        </div>
+
+        {/* My Crops / All Crops Toggle Bar */}
+        <div className="flex items-center justify-between text-xs pt-1">
+          <span className="font-bold text-green-400">
+            {showAllCrops ? "Showing All Mandi Crops (APMC)" : `My Crops (${userCrops.length})`}
+          </span>
+          <button
+            onClick={() => {
+              const next = !showAllCrops;
+              setShowAllCrops(next);
+              loadMarketData(userProfile?.region || "Tamil Nadu, India", next ? ALL_CROPS : userCrops);
+            }}
+            className="bg-green-500/20 text-green-300 border border-green-500/30 px-3 py-1 rounded-xl font-semibold hover:bg-green-500/30 transition-all"
+          >
+            {showAllCrops ? "Show My Crops Only" : "Show All Crops"}
+          </button>
         </div>
       </div>
 
       {/* Tab bar */}
-      <div className="bg-[#1a5c2a] px-4 sticky top-0 z-10">
-        <div className="flex gap-1 pb-3 w-full">
-          {["prices", "forecast"].map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all capitalize ${
-                activeTab === tab
-                  ? "bg-[#4ade80] text-[#0d1f3c] shadow-md"
-                  : "text-white/60 hover:text-white"
-              }`}
-            >
-              {tab === "prices" ? `📊 ${livePricesStr}` : `📈 ${selectedCrop ? t(CROP_KEYS[selectedCrop] || selectedCrop, langCode) : t("price_forecast", langCode)}`}
-            </button>
-          ))}
+      <div className="bg-[#052e16] px-4 py-3 border-b border-green-900/50">
+        <div className="flex gap-2 bg-black/30 p-1 rounded-2xl">
+          <button
+            onClick={() => setActiveTab("prices")}
+            className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${
+              activeTab === "prices" ? "bg-green-600 text-white shadow-lg" : "text-gray-400 hover:text-white"
+            }`}
+          >
+            Live APMC Prices
+          </button>
+          <button
+            onClick={() => setActiveTab("forecast")}
+            className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${
+              activeTab === "forecast" ? "bg-green-600 text-white shadow-lg" : "text-gray-400 hover:text-white"
+            }`}
+          >
+            AI Market Forecast
+          </button>
         </div>
       </div>
 
-      <BottomNav />
-
-      {refreshing && (
-        <div className="flex justify-center py-3 bg-[#1a5c2a]">
-          <div className="w-5 h-5 border-2 border-[#4ade80] border-t-transparent rounded-full animate-spin" />
-        </div>
-      )}
-
       {/* Content */}
-      <div ref={containerRef} className="w-full pb-20 min-h-[60vh]">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-          >
-            {activeTab === "prices" && (
-              <div className="p-4 space-y-3">
-                {loading ? (
-                  [1, 2, 3].map(i => <SkeletonCard key={i} height="h-28" lines={3} />)
-                ) : priceError ? (
-                  <ErrorCard label={t("market_prices", langCode)} onRetry={() => fetchPrices(crops, region)} />
-                ) : filteredCrops.length === 0 ? (
-                  <div className="text-center py-16 text-gray-400">
-                    <p className="text-3xl mb-2">🔍</p>
-                    <p>{t("no_crops_found", langCode)} "{search}"</p>
-                  </div>
-                ) : (
-                  filteredCrops.map((crop, i) => (
-                    <PriceCard
-                      key={crop}
-                      crop={t(CROP_KEYS[crop] || crop, langCode)}
-                      priceData={priceData[crop]}
-                      isSelected={selectedCrop === crop}
-                      onSelect={() => handleSelectCrop(crop)}
-                      onSetAlert={(c, data) => setAlertModal({ crop: c, priceData: data })}
-                      index={i}
-                    />
-                  ))
-                )}
-
-                {!loading && filteredCrops.length > 0 && (
-                  <p className="text-center text-xs text-gray-400 pt-2">
-                    {t("tap_forecast_hint", langCode)}
-                  </p>
-                )}
+      <div className="p-4">
+        {activeTab === "prices" ? (
+          loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="h-32 bg-green-950/40 rounded-3xl animate-pulse border border-green-800/30" />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredCrops.map(crop => (
+                <PriceCard
+                  key={crop}
+                  crop={crop}
+                  priceInfo={priceData[crop]}
+                  onSetAlert={() => setAlertModal({ crop, priceData: priceData[crop] })}
+                  onSelect={() => handleSelectCrop(crop)}
+                />
+              ))}
+            </div>
+          )
+        ) : (
+          <div>
+            {/* Horizontal Crop Selection Bar inside AI Forecast Tab */}
+            <div className="mb-4">
+              <p className="text-xs text-green-400 font-extrabold mb-2 uppercase tracking-wider">Select Crop for APMC Market Forecast:</p>
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+                {ALL_CROPS.map(c => (
+                  <button
+                    key={c}
+                    onClick={() => setSelectedCrop(c)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-extrabold flex-shrink-0 transition-all ${
+                      selectedCrop === c
+                        ? "bg-[#4ade80] text-[#052e16] shadow-md ring-2 ring-green-300"
+                        : "bg-white/10 text-white/80 hover:bg-white/20 border border-green-800/40"
+                    }`}
+                  >
+                    {c}
+                  </button>
+                ))}
               </div>
-            )}
+            </div>
 
-            {activeTab === "forecast" && (
-              <div className="p-4 space-y-4">
-                {!selectedCrop ? (
-                  <div className="text-center py-16 text-gray-400">
-                    <p className="text-4xl mb-3">📊</p>
-                    <p className="font-medium text-gray-600">
-                      {t("no_crop_selected", langCode)}
-                    </p>
-                    <p className="text-sm mt-1">
-                      {t("no_crop_selected_desc", langCode)}
-                    </p>
-                  </div>
-                ) : (
-                  <>
-                    <PriceTrendChart
-                      crop={t(CROP_KEYS[selectedCrop] || selectedCrop, langCode)}
-                      trendData={trendData}
-                      loading={trendLoading}
-                    />
-                    <div>
-                      <p className="text-sm font-bold text-[#1a5c2a] mb-3 px-1">
-                        {t("ai_intelligence", langCode)}
-                      </p>
-                      <AIPriceForecast
-                        crop={t(CROP_KEYS[selectedCrop] || selectedCrop, langCode)}
-                        forecast={aiForecast}
-                        loading={forecastLoading}
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
+            <h2 className="font-extrabold text-lg text-white mb-3 flex items-center gap-2">
+              <span>APMC Market Intelligence:</span>
+              <span className="text-[#4ade80]">{selectedCrop}</span>
+            </h2>
+
+            <PriceTrendChart crop={selectedCrop} />
+            <AIPriceForecast crop={selectedCrop} />
+          </div>
+        )}
       </div>
 
       {/* Alert Modal */}
       {alertModal && (
         <SetAlertModal
-          crop={t(CROP_KEYS[alertModal.crop] || alertModal.crop, langCode)}
+          crop={alertModal.crop}
           currentPrice={alertModal.priceData?.modal_price}
           unit={alertModal.priceData?.unit}
-          region={region}
+          region={userProfile?.region}
           onClose={() => setAlertModal(null)}
         />
       )}
+
+      <BottomNav />
     </div>
   );
 }

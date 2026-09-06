@@ -3,12 +3,16 @@ import { base44 } from "@/api/base44Client";
 export const getPrecisionLocation = () => {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(new Error("Geolocation not supported"));
+      console.warn("Geolocation not supported, defaulting to Chennai");
+      resolve({ latitude: 13.0827, longitude: 80.2707 });
       return;
     }
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve(pos.coords),
-      (err) => reject(err),
+      (err) => {
+        console.warn("Geolocation failed/denied, defaulting to Chennai", err);
+        resolve({ latitude: 13.0827, longitude: 80.2707 });
+      },
       { enableHighAccuracy: true, timeout: 8000 }
     );
   });

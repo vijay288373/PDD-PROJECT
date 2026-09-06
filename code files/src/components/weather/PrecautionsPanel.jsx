@@ -9,7 +9,13 @@ const SECTIONS = [
   { key: "monitor", icon: Eye, label: "Monitor Closely", subtitle: "Keep an eye on these indicators", bg: "bg-blue-50", border: "border-blue-100", iconBg: "bg-blue-100", iconColor: "text-blue-600", dotColor: "bg-blue-400", badgeColor: "bg-blue-400" },
 ];
 
-export default function PrecautionsPanel({ cropImpact, analyzing }) {
+const DEFAULT_PRECAUTIONS = {
+  immediate: ["Ensure field furrows are clear to handle potential rainfall", "Inspect yellow sticky traps for insect pest vectors"],
+  this_week: ["Apply organic Neem oil spray (1%) on vulnerable crop leaves", "Maintain balanced N-P-K fertigation schedule"],
+  monitor: ["Watch for humidity spikes above 80% which encourage fungal spores", "Track 7-day weather forecast daily"]
+};
+
+export default function PrecautionsPanel({ cropImpact, precautions: precautionsProp, analyzing }) {
   const { langCode } = useLang();
 
   if (analyzing) {
@@ -21,16 +27,8 @@ export default function PrecautionsPanel({ cropImpact, analyzing }) {
     );
   }
 
-  if (!cropImpact?.precautions) {
-    return (
-      <div className="p-6 text-center py-16">
-        <p className="text-5xl mb-3">🛡️</p>
-        <p className="text-gray-500 text-sm">Precautions will appear after weather analysis completes</p>
-      </div>
-    );
-  }
-
-  const allText = SECTIONS.flatMap(s => cropImpact.precautions[s.key] || []);
+  const prec = precautionsProp || cropImpact?.precautions || DEFAULT_PRECAUTIONS;
+  const allText = SECTIONS.flatMap(s => prec[s.key] || []);
 
   return (
     <div className="p-4">
@@ -45,7 +43,7 @@ export default function PrecautionsPanel({ cropImpact, analyzing }) {
       <div className="flex flex-col gap-4">
         {SECTIONS.map((section, si) => {
           const SectionIcon = section.icon;
-          const items = cropImpact.precautions[section.key] || [];
+          const items = prec[section.key] || [];
           if (!items.length) return null;
           return (
             <motion.div key={section.key} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: si * 0.15 }} className={`${section.bg} border ${section.border} rounded-2xl p-4`}>

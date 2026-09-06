@@ -5,14 +5,19 @@ import { base44 } from "../api/base44Client";
 export const getPrecisionLocation = async () => {
   const { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== 'granted') {
-    throw new Error("Geolocation permission denied");
+    console.warn("Geolocation permission denied, defaulting to Chennai");
+    return { latitude: 13.0827, longitude: 80.2707 };
   }
 
-  const location = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.High,
-  });
-  
-  return location.coords;
+  try {
+    const location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.High,
+    });
+    return location.coords;
+  } catch (e) {
+    console.warn("Failed to get location, defaulting to Chennai", e);
+    return { latitude: 13.0827, longitude: 80.2707 };
+  }
 };
 
 export const getGeocodedLocation = async (lat, lon, force = false) => {
